@@ -19,11 +19,19 @@ interface DashboardProps {
   currentUser: Participant
   drawingState: DrawingState
   onLogout: () => void
-  onUpdateState: (state: DrawingState) => void
+  onUpdateState: () => void // Changed to reload function
   onNewDraw: (winnerId: string) => void
+  onImageUpload: (day: number, imageData: string) => void // Added image upload prop
 }
 
-export default function Dashboard({ currentUser, drawingState, onLogout, onUpdateState, onNewDraw }: DashboardProps) {
+export default function Dashboard({
+  currentUser,
+  drawingState,
+  onLogout,
+  onUpdateState,
+  onNewDraw,
+  onImageUpload,
+}: DashboardProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showImageUpload, setShowImageUpload] = useState(false)
@@ -32,7 +40,7 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
   const today = new Date()
 
   const todayWinner = drawingState.winnersByDay[currentDay]
-  const needsImageUpload = todayWinner === currentUser.id && !drawingState.dayImages[currentDay]
+  const needsImageUpload = todayWinner === currentUser.id && !drawingState.imagesByDay[currentDay]
 
   const handleImageUploadPrompt = () => {
     if (needsImageUpload) {
@@ -41,16 +49,9 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
     }
   }
 
-  const handleImageUpload = (imageData: string) => {
+  const handleImageUpload = async (imageData: string) => {
     if (uploadDay) {
-      const newState = {
-        ...drawingState,
-        dayImages: {
-          ...drawingState.dayImages,
-          [uploadDay]: imageData,
-        },
-      }
-      onUpdateState(newState)
+      await onImageUpload(uploadDay, imageData)
       setShowImageUpload(false)
       setUploadDay(null)
     }
@@ -120,7 +121,7 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
             <CalendarGrid
               currentDay={currentDay}
               winnersByDay={drawingState.winnersByDay}
-              dayImages={drawingState.dayImages}
+              dayImages={drawingState.imagesByDay}
               participants={drawingState.participants}
               onDayClick={setSelectedDay}
             />
@@ -173,9 +174,10 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
       <SettingsDialog
         open={showSettings}
         onOpenChange={setShowSettings}
-        settings={drawingState.settings}
+        settings={drawingState.settings || { soundEnabled: true, confettiEnabled: true }}
         onUpdateSettings={(settings) => {
-          onUpdateState({ ...drawingState, settings })
+          // Settings are stored locally in localStorage
+          localStorage.setItem("userSettings", JSON.stringify(settings))
         }}
       />
 

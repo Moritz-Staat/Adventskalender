@@ -12,7 +12,7 @@ interface DrawPanelProps {
   currentDay: number
   currentUser: Participant
   drawingState: DrawingState
-  onUpdateState: (state: DrawingState) => void
+  onUpdateState: () => void // Changed to reload function
   onNewDraw: (winnerId: string) => void
   onRequestImageUpload: () => void
 }
@@ -31,7 +31,7 @@ export default function DrawPanel({
 
   const todayWinner = drawingState.winnersByDay[currentDay]
   const isWinner = todayWinner === currentUser.id
-  const hasUploadedImage = drawingState.dayImages[currentDay] !== undefined
+  const hasUploadedImage = drawingState.imagesByDay[currentDay] !== undefined
   const needsImageUpload = isWinner && !hasUploadedImage
 
   const handleDraw = () => {
@@ -39,8 +39,9 @@ export default function DrawPanel({
     setShowWheel(true)
   }
 
-  const handleDrawComplete = (winnerId: string) => {
-    onNewDraw(winnerId)
+  const handleDrawComplete = async (winnerId: string) => {
+    await onNewDraw(winnerId)
+    await onUpdateState()
     setTimeout(() => setShowWheel(false), 3000)
   }
 
@@ -190,8 +191,8 @@ export default function DrawPanel({
         open={showWheel}
         participants={eligibleParticipants}
         onComplete={handleDrawComplete}
-        soundEnabled={drawingState.settings.soundEnabled}
-        confettiEnabled={drawingState.settings.confettiEnabled}
+        soundEnabled={drawingState.settings?.soundEnabled ?? true}
+        confettiEnabled={drawingState.settings?.confettiEnabled ?? true}
       />
     </>
   )

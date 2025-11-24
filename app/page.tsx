@@ -5,70 +5,59 @@ import LoginPage from "@/components/login-page"
 import Dashboard from "@/components/dashboard"
 import WheelModal from "@/components/wheel-modal"
 import type { Participant, DrawingState } from "@/lib/types"
-import { performDraw } from "@/lib/draw-logic"
 import { getCurrentDay } from "@/lib/utils"
+import {
+  getDrawingState,
+  hasUserViewedDraw,
+  markDrawAsViewed,
+  performDraw as performSupabaseDraw,
+  uploadDrawImage,
+} from "@/lib/supabase-helpers"
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<Participant | null>(null)
   const [drawingState, setDrawingState] = useState<DrawingState | null>(null)
   const [showLoginAnimation, setShowLoginAnimation] = useState(false)
   const [pendingWinner, setPendingWinner] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const APP_VERSION = "2.1"
-    const storedVersion = localStorage.getItem("appVersion")
-
-    if (storedVersion !== APP_VERSION) {
-      localStorage.clear()
-      localStorage.setItem("appVersion", APP_VERSION)
-    }
-
-    const savedUser = localStorage.getItem("currentUser")
-    const savedState = localStorage.getItem("drawingState")
-
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser))
-    }
-
-    if (savedState) {
-      const state = JSON.parse(savedState)
-      if (!state.dayImages) {
-        state.dayImages = {}
-      }
-      setDrawingState(state)
-    } else {
-      const defaultState: DrawingState = {
-        participants: [
-          { id: "moritz", name: "Moritz", color: "#2d5f4f" },
-          { id: "claudia", name: "Claudia", color: "#b52b3b" },
-          { id: "christian", name: "Christian", color: "#d4a574" },
-          { id: "ella", name: "Ella", color: "#8b3a3a" },
-          { id: "clara", name: "Clara", color: "#0f3d2e" },
-        ],
-        winnersByDay: {},
-        dayImages: {},
-        currentCycleWinners: [],
-        settings: {
-          soundEnabled: true,
-          confettiEnabled: true,
-        },
-      }
-      setDrawingState(defaultState)
-      localStorage.setItem("drawingState", JSON.stringify(defaultState))
-    }
+    loadData()
   }, [])
 
-  const hasSeenTodayAnimation = (userId: string, day: number): boolean => {
-    const key = `animation_seen_${userId}_${day}`
-    return localStorage.getItem(key) === "true"
+  const loadData = async () => {
+    try {
+      setIsLoading(true)
+      // Load drawing state from Supabase
+      const state = await getDrawingState()
+      setDrawingState(state)
+
+      // Check for saved user in localStorage (session management)
+      const savedUser = localStorage.getItem("currentUser")
+      if (savedUser) {
+        const user = JSON.parse(savedUser)
+        setCurrentUser(user)
+
+        // Check if user needs to see today's animation
+        const currentDay = getCurrentDay()
+        const todayWinner = state.winnersByDay[currentDay]
+
+        if (todayWinner) {
+          const hasViewed = await hasUserViewedDraw(user.id, currentDay)
+          if (!hasViewed) {
+            setPendingWinner(todayWinner)
+            setShowLoginAnimation(true)
+          }
+        }
+      }
+    } catch (error) {
+      console.error("[v0] Error loading data from Supabase:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const markAnimationSeen = (userId: string, day: number) => {
-    const key = `animation_seen_${userId}_${day}`
-    localStorage.setItem(key, "true")
-  }
-
-  const handleLogin = (user: Participant) => {
+  const handleLogin = async (user: Participant) => {
     setCurrentUser(user)
     localStorage.setItem("currentUser", JSON.stringify(user))
 
@@ -76,9 +65,12 @@ export default function Home() {
       const currentDay = getCurrentDay()
       const todayWinner = drawingState.winnersByDay[currentDay]
 
-      if (todayWinner && !hasSeenTodayAnimation(user.id, currentDay)) {
-        setPendingWinner(todayWinner)
-        setShowLoginAnimation(true)
+      if (todayWinner) {
+        const hasViewed = await hasUserViewedDraw(user.id, currentDay)
+        if (!hasViewed) {
+          setPendingWinner(todayWinner)
+          setShowLoginAnimation(true)
+        }
       }
     }
   }
@@ -88,28 +80,56 @@ export default function Home() {
     localStorage.removeItem("currentUser")
   }
 
-  const updateDrawingState = (newState: DrawingState) => {
-    setDrawingState(newState)
-    localStorage.setItem("drawingState", JSON.stringify(newState))
+  const reloadDrawingState = async () => {
+    try {
+      const state = await getDrawingState()
+      setDrawingState(state)
+    } catch (error) {
+      console.error("[v0] Error reloading drawing state:", error)
+    }
   }
 
-  const handleLoginAnimationComplete = () => {
+  const handleLoginAnimationComplete = async () => {
     if (currentUser && pendingWinner) {
       const currentDay = getCurrentDay()
-      markAnimationSeen(currentUser.id, currentDay)
+      await markDrawAsViewed(currentUser.id, currentDay)
     }
     setShowLoginAnimation(false)
     setPendingWinner(null)
   }
 
-  const handleNewDraw = (winnerId: string) => {
-    if (!drawingState || !currentUser) return
+  const handleNewDraw = async (winnerId: string) => {
+    if (!currentUser) return
 
     const currentDay = getCurrentDay()
-    const newState = performDraw(drawingState, currentDay, winnerId)
-    updateDrawingState(newState)
 
-    markAnimationSeen(currentUser.id, currentDay)
+    await performSupabaseDraw(currentDay)
+
+    await markDrawAsViewed(currentUser.id, currentDay)
+
+    // Reload state
+    await reloadDrawingState()
+  }
+
+  const handleImageUpload = async (day: number, imageData: string) => {
+    try {
+      await uploadDrawImage(day, imageData)
+      // Reload state to show the uploaded image
+      await reloadDrawingState()
+    } catch (error) {
+      console.error("[v0] Error uploading image:", error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🎄</div>
+          <p className="text-xl text-[#0f3d2e] font-medium">Lädt...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!currentUser || !drawingState) {
@@ -122,8 +142,9 @@ export default function Home() {
         currentUser={currentUser}
         drawingState={drawingState}
         onLogout={handleLogout}
-        onUpdateState={updateDrawingState}
+        onUpdateState={reloadDrawingState}
         onNewDraw={handleNewDraw}
+        onImageUpload={handleImageUpload}
       />
 
       {showLoginAnimation && pendingWinner && (
@@ -131,8 +152,8 @@ export default function Home() {
           open={showLoginAnimation}
           participants={drawingState.participants}
           onComplete={handleLoginAnimationComplete}
-          soundEnabled={drawingState.settings.soundEnabled}
-          confettiEnabled={drawingState.settings.confettiEnabled}
+          soundEnabled={drawingState.settings?.soundEnabled ?? true}
+          confettiEnabled={drawingState.settings?.confettiEnabled ?? true}
           preselectedWinnerId={pendingWinner}
         />
       )}
