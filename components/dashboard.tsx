@@ -11,6 +11,7 @@ import HistoryPanel from "@/components/history-panel"
 import StatsPanel from "@/components/stats-panel"
 import SettingsDialog from "@/components/settings-dialog"
 import Snowfall from "@/components/snowfall"
+import ImageUploadModal from "@/components/image-upload-modal"
 import type { Participant, DrawingState } from "@/lib/types"
 import { getCurrentDay, getMonthName } from "@/lib/utils"
 
@@ -25,8 +26,35 @@ interface DashboardProps {
 export default function Dashboard({ currentUser, drawingState, onLogout, onUpdateState, onNewDraw }: DashboardProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [showSettings, setShowSettings] = useState(false)
+  const [showImageUpload, setShowImageUpload] = useState(false)
+  const [uploadDay, setUploadDay] = useState<number | null>(null)
   const currentDay = getCurrentDay()
   const today = new Date()
+
+  const todayWinner = drawingState.winnersByDay[currentDay]
+  const needsImageUpload = todayWinner === currentUser.id && !drawingState.dayImages[currentDay]
+
+  const handleImageUploadPrompt = () => {
+    if (needsImageUpload) {
+      setUploadDay(currentDay)
+      setShowImageUpload(true)
+    }
+  }
+
+  const handleImageUpload = (imageData: string) => {
+    if (uploadDay) {
+      const newState = {
+        ...drawingState,
+        dayImages: {
+          ...drawingState.dayImages,
+          [uploadDay]: imageData,
+        },
+      }
+      onUpdateState(newState)
+      setShowImageUpload(false)
+      setUploadDay(null)
+    }
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
@@ -92,6 +120,7 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
             <CalendarGrid
               currentDay={currentDay}
               winnersByDay={drawingState.winnersByDay}
+              dayImages={drawingState.dayImages}
               participants={drawingState.participants}
               onDayClick={setSelectedDay}
             />
@@ -106,9 +135,11 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
             >
               <DrawPanel
                 currentDay={currentDay}
+                currentUser={currentUser}
                 drawingState={drawingState}
                 onUpdateState={onUpdateState}
                 onNewDraw={onNewDraw}
+                onRequestImageUpload={handleImageUploadPrompt}
               />
             </motion.div>
 
@@ -146,6 +177,14 @@ export default function Dashboard({ currentUser, drawingState, onLogout, onUpdat
         onUpdateSettings={(settings) => {
           onUpdateState({ ...drawingState, settings })
         }}
+      />
+
+      <ImageUploadModal
+        open={showImageUpload}
+        onClose={() => setShowImageUpload(false)}
+        onUpload={handleImageUpload}
+        winnerName={currentUser.name}
+        day={uploadDay || currentDay}
       />
     </div>
   )

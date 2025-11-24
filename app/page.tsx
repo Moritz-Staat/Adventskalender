@@ -15,7 +15,14 @@ export default function Home() {
   const [pendingWinner, setPendingWinner] = useState<string | null>(null)
 
   useEffect(() => {
-    // Load state from localStorage
+    const APP_VERSION = "2.1"
+    const storedVersion = localStorage.getItem("appVersion")
+
+    if (storedVersion !== APP_VERSION) {
+      localStorage.clear()
+      localStorage.setItem("appVersion", APP_VERSION)
+    }
+
     const savedUser = localStorage.getItem("currentUser")
     const savedState = localStorage.getItem("drawingState")
 
@@ -24,17 +31,22 @@ export default function Home() {
     }
 
     if (savedState) {
-      setDrawingState(JSON.parse(savedState))
+      const state = JSON.parse(savedState)
+      if (!state.dayImages) {
+        state.dayImages = {}
+      }
+      setDrawingState(state)
     } else {
       const defaultState: DrawingState = {
         participants: [
-          { id: "1", name: "Moritz", color: "#2d5f4f" },
-          { id: "2", name: "Claudia", color: "#b52b3b" },
-          { id: "3", name: "Christian", color: "#d4a574" },
-          { id: "4", name: "Ella", color: "#8b3a3a" },
-          { id: "5", name: "Clara", color: "#0f3d2e" },
+          { id: "moritz", name: "Moritz", color: "#2d5f4f" },
+          { id: "claudia", name: "Claudia", color: "#b52b3b" },
+          { id: "christian", name: "Christian", color: "#d4a574" },
+          { id: "ella", name: "Ella", color: "#8b3a3a" },
+          { id: "clara", name: "Clara", color: "#0f3d2e" },
         ],
         winnersByDay: {},
+        dayImages: {},
         currentCycleWinners: [],
         settings: {
           soundEnabled: true,
@@ -65,7 +77,6 @@ export default function Home() {
       const todayWinner = drawingState.winnersByDay[currentDay]
 
       if (todayWinner && !hasSeenTodayAnimation(user.id, currentDay)) {
-        // Show animation with existing winner
         setPendingWinner(todayWinner)
         setShowLoginAnimation(true)
       }
@@ -98,7 +109,6 @@ export default function Home() {
     const newState = performDraw(drawingState, currentDay, winnerId)
     updateDrawingState(newState)
 
-    // Mark as seen for current user
     markAnimationSeen(currentUser.id, currentDay)
   }
 

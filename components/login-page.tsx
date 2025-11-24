@@ -25,7 +25,10 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!drawingState) return
+    if (!drawingState) {
+      setError("System wird geladen...")
+      return
+    }
 
     const user = drawingState.participants.find((p) => p.name.toLowerCase() === username.toLowerCase())
 
@@ -55,7 +58,7 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
               </motion.div>
               <CardTitle className="text-3xl font-bold text-[#0f3d2e]">Familien-Adventskalender</CardTitle>
               <CardDescription className="text-base text-[#0f3d2e]/70">
-                Melde dich mit deinem Vornamen an
+                Melde dich mit deinem Vornamen an (Moritz, Claudia, Christian, Ella, Clara)
               </CardDescription>
             </CardHeader>
 

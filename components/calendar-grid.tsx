@@ -8,11 +8,18 @@ import type { Participant } from "@/lib/types"
 interface CalendarGridProps {
   currentDay: number
   winnersByDay: Record<number, string>
+  dayImages: Record<number, string>
   participants: Participant[]
   onDayClick: (day: number) => void
 }
 
-export default function CalendarGrid({ currentDay, winnersByDay, participants, onDayClick }: CalendarGridProps) {
+export default function CalendarGrid({
+  currentDay,
+  winnersByDay,
+  dayImages,
+  participants,
+  onDayClick,
+}: CalendarGridProps) {
   const days = Array.from({ length: 25 }, (_, i) => i + 1)
 
   const getWinner = (day: number) => {
@@ -34,6 +41,7 @@ export default function CalendarGrid({ currentDay, winnersByDay, participants, o
         {days.map((day) => {
           const status = getDayStatus(day)
           const winner = getWinner(day)
+          const dayImage = dayImages[day]
           const isToday = status === "today"
           const isPast = status === "past"
           const isFuture = status === "future"
@@ -43,7 +51,7 @@ export default function CalendarGrid({ currentDay, winnersByDay, participants, o
               key={day}
               onClick={() => !isFuture && onDayClick(day)}
               className={`
-                relative aspect-square rounded-lg flex flex-col items-center justify-center
+                relative aspect-square rounded-lg flex flex-col items-center justify-center overflow-hidden
                 transition-all duration-300 cursor-pointer
                 ${isFuture ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-lg"}
                 ${isToday ? "ring-4 ring-[#b52b3b] ring-offset-2" : ""}
@@ -58,9 +66,20 @@ export default function CalendarGrid({ currentDay, winnersByDay, participants, o
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: day * 0.02 }}
             >
+              {dayImage && (
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${dayImage})`,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/20" />
+                </div>
+              )}
+
               {isToday && (
                 <motion.div
-                  className="absolute -top-1 -right-1"
+                  className="absolute -top-1 -right-1 z-10"
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                 >
@@ -68,15 +87,19 @@ export default function CalendarGrid({ currentDay, winnersByDay, participants, o
                 </motion.div>
               )}
 
-              <span className={`text-xl md:text-2xl font-bold ${isPast && winner ? "text-white" : "text-[#0f3d2e]"}`}>
+              <span
+                className={`relative z-10 text-xl md:text-2xl font-bold ${
+                  (isPast && winner) || dayImage ? "text-white drop-shadow-lg" : "text-[#0f3d2e]"
+                }`}
+              >
                 {day}
               </span>
 
-              {isFuture && <Lock className="w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
+              {isFuture && <Lock className="relative z-10 w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
 
               {isPast && winner && (
                 <div
-                  className="absolute bottom-1 right-1 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/90 flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md"
+                  className="absolute bottom-1 right-1 z-10 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/90 flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md"
                   style={{ color: winner.color }}
                 >
                   {winner.name.charAt(0)}

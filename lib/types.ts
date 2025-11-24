@@ -12,6 +12,7 @@ export interface Settings {
 export interface DrawingState {
   participants: Participant[]
   winnersByDay: Record<number, string>
+  dayImages: Record<number, string>
   currentCycleWinners: string[]
   settings: Settings
 }
