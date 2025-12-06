@@ -11,6 +11,7 @@ interface CalendarGridProps {
   dayImages: Record<number, string>
   participants: Participant[]
   onDayClick: (day: number) => void
+  onImageClick?: (day: number) => void
 }
 
 export default function CalendarGrid({
@@ -19,6 +20,7 @@ export default function CalendarGrid({
   dayImages,
   participants,
   onDayClick,
+  onImageClick,
 }: CalendarGridProps) {
   const days = Array.from({ length: 25 }, (_, i) => i + 1)
 
@@ -49,7 +51,15 @@ export default function CalendarGrid({
           return (
             <motion.button
               key={day}
-              onClick={() => !isFuture && onDayClick(day)}
+              onClick={() => {
+                if (!isFuture) {
+                  if (dayImage && onImageClick) {
+                    onImageClick(day)
+                  } else {
+                    onDayClick(day)
+                  }
+                }
+              }}
               className={`
                 relative aspect-square rounded-lg flex flex-col items-center justify-center overflow-hidden
                 transition-all duration-300 cursor-pointer
@@ -68,7 +78,7 @@ export default function CalendarGrid({
             >
               {dayImage && (
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center cursor-zoom-in"
                   style={{
                     backgroundImage: `url(${dayImage})`,
                   }}

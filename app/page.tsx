@@ -12,6 +12,7 @@ import {
   markDrawAsViewed,
   performDraw as performSupabaseDraw,
   uploadDrawImage,
+  uploadImageToStorage,
 } from "@/lib/supabase-helpers"
 
 export default function Home() {
@@ -111,10 +112,10 @@ export default function Home() {
     await reloadDrawingState()
   }
 
-  const handleImageUpload = async (day: number, imageData: string) => {
+  const handleImageUpload = async (day: number, file: File) => {
     try {
-      await uploadDrawImage(day, imageData)
-      // Reload state to show the uploaded image
+      const imageUrl = await uploadImageToStorage(day, file)
+      await uploadDrawImage(day, imageUrl)
       await reloadDrawingState()
     } catch (error) {
       console.error("[v0] Error uploading image:", error)

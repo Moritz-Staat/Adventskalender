@@ -10,13 +10,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 interface ImageUploadModalProps {
   open: boolean
   onClose: () => void
-  onUpload: (imageData: string) => void
+  onUpload: (file: File) => void
   winnerName: string
   day: number
 }
 
 export default function ImageUploadModal({ open, onClose, onUpload, winnerName, day }: ImageUploadModalProps) {
   const [preview, setPreview] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -26,6 +27,8 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
       alert("Bitte wähle eine Bilddatei aus")
       return
     }
+
+    setSelectedFile(file)
 
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -53,9 +56,10 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
   }
 
   const handleUploadClick = () => {
-    if (preview) {
-      onUpload(preview)
+    if (preview && selectedFile) {
+      onUpload(selectedFile)
       setPreview(null)
+      setSelectedFile(null)
       onClose()
     }
   }
@@ -141,7 +145,10 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
                   className="w-full h-auto max-h-96 object-contain bg-gray-50"
                 />
                 <Button
-                  onClick={() => setPreview(null)}
+                  onClick={() => {
+                    setPreview(null)
+                    setSelectedFile(null)
+                  }}
                   className="absolute top-2 right-2 bg-white/90 hover:bg-white text-[#b52b3b]"
                   size="icon"
                 >
@@ -151,7 +158,10 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
 
               <div className="grid grid-cols-2 gap-4">
                 <Button
-                  onClick={() => setPreview(null)}
+                  onClick={() => {
+                    setPreview(null)
+                    setSelectedFile(null)
+                  }}
                   variant="outline"
                   className="border-[#0f3d2e] text-[#0f3d2e] hover:bg-[#0f3d2e]/5"
                   size="lg"

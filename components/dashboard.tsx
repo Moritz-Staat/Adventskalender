@@ -12,6 +12,7 @@ import StatsPanel from "@/components/stats-panel"
 import SettingsDialog from "@/components/settings-dialog"
 import Snowfall from "@/components/snowfall"
 import ImageUploadModal from "@/components/image-upload-modal"
+import { ImageViewerModal } from "@/components/image-viewer-modal"
 import type { Participant, DrawingState } from "@/lib/types"
 import { getCurrentDay, getMonthName } from "@/lib/utils"
 
@@ -21,7 +22,7 @@ interface DashboardProps {
   onLogout: () => void
   onUpdateState: () => void // Changed to reload function
   onNewDraw: (winnerId: string) => void
-  onImageUpload: (day: number, imageData: string) => void // Added image upload prop
+  onImageUpload: (day: number, file: File) => Promise<void> // Added image upload prop
 }
 
 export default function Dashboard({
@@ -36,6 +37,12 @@ export default function Dashboard({
   const [showSettings, setShowSettings] = useState(false)
   const [showImageUpload, setShowImageUpload] = useState(false)
   const [uploadDay, setUploadDay] = useState<number | null>(null)
+  const [viewerState, setViewerState] = useState<{ isOpen: boolean; day: number; imageUrl: string; winner: string }>({
+    isOpen: false,
+    day: 0,
+    imageUrl: "",
+    winner: "",
+  })
   const currentDay = getCurrentDay()
   const today = new Date()
 
@@ -49,11 +56,26 @@ export default function Dashboard({
     }
   }
 
-  const handleImageUpload = async (imageData: string) => {
+  const handleImageUpload = async (file: File) => {
     if (uploadDay) {
-      await onImageUpload(uploadDay, imageData)
+      await onImageUpload(uploadDay, file)
       setShowImageUpload(false)
       setUploadDay(null)
+    }
+  }
+
+  const handleImageView = (day: number) => {
+    const imageUrl = drawingState.imagesByDay[day]
+    const winnerId = drawingState.winnersByDay[day]
+    const winner = drawingState.participants.find((p) => p.id === winnerId)
+
+    if (imageUrl && winner) {
+      setViewerState({
+        isOpen: true,
+        day,
+        imageUrl,
+        winner: winner.name,
+      })
     }
   }
 
@@ -124,6 +146,7 @@ export default function Dashboard({
               dayImages={drawingState.imagesByDay}
               participants={drawingState.participants}
               onDayClick={setSelectedDay}
+              onImageClick={handleImageView}
             />
           </motion.div>
 
@@ -187,6 +210,14 @@ export default function Dashboard({
         onUpload={handleImageUpload}
         winnerName={currentUser.name}
         day={uploadDay || currentDay}
+      />
+
+      <ImageViewerModal
+        isOpen={viewerState.isOpen}
+        onClose={() => setViewerState({ ...viewerState, isOpen: false })}
+        imageUrl={viewerState.imageUrl}
+        day={viewerState.day}
+        winner={viewerState.winner}
       />
     </div>
   )

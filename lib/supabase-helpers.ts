@@ -121,13 +121,13 @@ export async function performDraw(day: number): Promise<string> {
 }
 
 // Bild für einen Tag hochladen
-export async function uploadDrawImage(day: number, imageDataUrl: string): Promise<void> {
+export async function uploadDrawImage(day: number, imageUrl: string): Promise<void> {
   const supabase = createClient()
 
   const { error } = await supabase
     .from("daily_draws")
     .update({
-      image_url: imageDataUrl,
+      image_url: imageUrl,
       uploaded_at: new Date().toISOString(),
     })
     .eq("day", day)
@@ -161,4 +161,27 @@ export async function getDrawingState(): Promise<DrawingState> {
     imagesByDay,
     settings,
   }
+}
+
+export async function uploadImageToStorage(day: number, file: File): Promise<string> {
+  const supabase = createClient()
+
+  // Eindeutigen Dateinamen erstellen
+  const fileExt = file.name.split(".").pop()
+  const fileName = `day-${day}-${Date.now()}.${fileExt}`
+
+  // Bild zu Supabase Storage hochladen
+  const { data, error } = await supabase.storage.from("advent-images").upload(fileName, file, {
+    cacheControl: "3600",
+    upsert: true,
+  })
+
+  if (error) throw error
+
+  // Öffentliche URL für das Bild holen
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("advent-images").getPublicUrl(fileName)
+
+  return publicUrl
 }
