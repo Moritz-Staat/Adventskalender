@@ -12,6 +12,8 @@ interface CalendarGridProps {
   participants: Participant[]
   onDayClick: (day: number) => void
   onImageClick?: (day: number) => void
+  isAdmin?: boolean
+  onAdminUploadClick?: (day: number) => void
 }
 
 export default function CalendarGrid({
@@ -21,6 +23,8 @@ export default function CalendarGrid({
   participants,
   onDayClick,
   onImageClick,
+  isAdmin = false,
+  onAdminUploadClick,
 }: CalendarGridProps) {
   const days = Array.from({ length: 25 }, (_, i) => i + 1)
 
@@ -47,6 +51,7 @@ export default function CalendarGrid({
           const isToday = status === "today"
           const isPast = status === "past"
           const isFuture = status === "future"
+          const canAdminUpload = isAdmin && !isFuture && winner && !dayImage
 
           return (
             <motion.button
@@ -55,6 +60,8 @@ export default function CalendarGrid({
                 if (!isFuture) {
                   if (dayImage && onImageClick) {
                     onImageClick(day)
+                  } else if (canAdminUpload && onAdminUploadClick) {
+                    onAdminUploadClick(day)
                   } else {
                     onDayClick(day)
                   }
@@ -65,6 +72,7 @@ export default function CalendarGrid({
                 transition-all duration-300 cursor-pointer
                 ${isFuture ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-lg"}
                 ${isToday ? "ring-4 ring-[#b52b3b] ring-offset-2" : ""}
+                ${canAdminUpload ? "ring-2 ring-[#b52b3b]/50 ring-offset-1" : ""}
               `}
               style={{
                 backgroundColor: isPast && winner ? winner.color : isFuture ? "#e5e5e5" : "#f5e6c8",
@@ -104,6 +112,14 @@ export default function CalendarGrid({
               >
                 {day}
               </span>
+
+              {!dayImage && winner && !isFuture && (
+                <div className="absolute inset-0 flex items-center justify-center z-5">
+                  <span className="text-white text-xs md:text-sm font-bold drop-shadow-lg text-center px-1">
+                    {winner.name}
+                  </span>
+                </div>
+              )}
 
               {isFuture && <Lock className="relative z-10 w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
 

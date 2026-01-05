@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { LogOut, Settings, Download } from "lucide-react"
+import { LogOut, Settings, Download, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import CalendarGrid from "@/components/calendar-grid"
@@ -22,9 +22,9 @@ interface DashboardProps {
   currentUser: Participant
   drawingState: DrawingState
   onLogout: () => void
-  onUpdateState: () => void // Changed to reload function
+  onUpdateState: () => void
   onNewDraw: (winnerId: string) => void
-  onImageUpload: (day: number, file: File) => Promise<void> // Added image upload prop
+  onImageUpload: (day: number, file: File) => Promise<void>
 }
 
 export default function Dashboard({
@@ -54,6 +54,13 @@ export default function Dashboard({
   const handleImageUploadPrompt = () => {
     if (needsImageUpload) {
       setUploadDay(currentDay)
+      setShowImageUpload(true)
+    }
+  }
+
+  const handleAdminUploadClick = (day: number) => {
+    if (currentUser.isAdmin) {
+      setUploadDay(day)
       setShowImageUpload(true)
     }
   }
@@ -92,7 +99,6 @@ export default function Dashboard({
 
       const zip = new JSZip()
 
-      // Download all images and add to ZIP
       for (const img of images) {
         try {
           const response = await fetch(img.imageUrl)
@@ -104,7 +110,6 @@ export default function Dashboard({
         }
       }
 
-      // Generate ZIP and download
       const content = await zip.generateAsync({ type: "blob" })
       const url = URL.createObjectURL(content)
       const a = document.createElement("a")
@@ -120,11 +125,126 @@ export default function Dashboard({
     }
   }
 
+  const handleDownloadCollage = async () => {
+    try {
+      const images = await getAllImages()
+
+      if (images.length === 0) {
+        alert("Keine Bilder zum Herunterladen verfügbar.")
+        return
+      }
+
+      const cols = 5
+      const rows = Math.ceil(images.length / cols)
+      const cellSize = 400
+      const padding = 20
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+
+      if (!ctx) {
+        alert("Canvas wird nicht unterstützt.")
+        return
+      }
+
+      canvas.width = cols * cellSize + (cols + 1) * padding
+      canvas.height = rows * cellSize + (rows + 1) * padding
+
+      ctx.fillStyle = "#f5e6c8"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.crossOrigin = "anonymous"
+          img.onload = () => resolve(img)
+          img.onerror = reject
+          img.src = src
+        })
+      }
+
+      for (let i = 0; i < images.length; i++) {
+        const img = images[i]
+        const col = i % cols
+        const row = Math.floor(i / cols)
+        const x = col * cellSize + (col + 1) * padding
+        const y = row * cellSize + (row + 1) * padding
+
+        try {
+          const loadedImg = await loadImage(img.imageUrl)
+
+          ctx.save()
+          ctx.fillStyle = "#ffffff"
+          ctx.fillRect(x, y, cellSize, cellSize)
+
+          const aspectRatio = loadedImg.width / loadedImg.height
+          let drawWidth = cellSize
+          let drawHeight = cellSize
+          let offsetX = 0
+          let offsetY = 0
+
+          if (aspectRatio > 1) {
+            drawHeight = cellSize / aspectRatio
+            offsetY = (cellSize - drawHeight) / 2
+          } else {
+            drawWidth = cellSize * aspectRatio
+            offsetX = (cellSize - drawWidth) / 2
+          }
+
+          ctx.drawImage(loadedImg, x + offsetX, y + offsetY, drawWidth, drawHeight)
+
+          ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
+          ctx.fillRect(x, y, 60, 40)
+          ctx.fillStyle = "#ffffff"
+          ctx.font = "bold 24px sans-serif"
+          ctx.textAlign = "center"
+          ctx.textBaseline = "middle"
+          ctx.fillText(img.day.toString(), x + 30, y + 20)
+
+          ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
+          ctx.fillRect(x, y + cellSize - 40, cellSize, 40)
+          ctx.fillStyle = "#ffffff"
+          ctx.font = "bold 18px sans-serif"
+          ctx.textAlign = "center"
+          ctx.textBaseline = "middle"
+          ctx.fillText(img.winner, x + cellSize / 2, y + cellSize - 20)
+
+          ctx.restore()
+        } catch (error) {
+          console.error(`[v0] Error loading image for day ${img.day}:`, error)
+        }
+      }
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement("a")
+          a.href = url
+          a.download = `Adventskalender_Collage_${new Date().getFullYear()}.png`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }
+      })
+    } catch (error) {
+      console.error("[v0] Error creating collage:", error)
+      alert("Fehler beim Erstellen der Collage.")
+    }
+  }
+
+  const getWinnerName = () => {
+    if (uploadDay) {
+      const winnerId = drawingState.winnersByDay[uploadDay]
+      const winner = drawingState.participants.find((p) => p.id === winnerId)
+      return winner?.name || currentUser.name
+    }
+    return currentUser.name
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
       <Snowfall />
 
-      {/* Header */}
       <motion.header
         className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#0f3d2e]/10 shadow-sm"
         initial={{ y: -100 }}
@@ -159,10 +279,16 @@ export default function Dashboard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 {currentUser.isAdmin && (
-                  <DropdownMenuItem onClick={handleDownloadAllImages}>
-                    <Download className="w-4 h-4 mr-2" />
-                    Alle Bilder herunterladen
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem onClick={handleDownloadAllImages}>
+                      <Download className="w-4 h-4 mr-2" />
+                      Als ZIP herunterladen
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDownloadCollage}>
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                      Als Collage herunterladen
+                    </DropdownMenuItem>
+                  </>
                 )}
                 <DropdownMenuItem onClick={() => setShowSettings(true)}>
                   <Settings className="w-4 h-4 mr-2" />
@@ -178,10 +304,8 @@ export default function Dashboard({
         </div>
       </motion.header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left: Calendar Grid */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -194,10 +318,11 @@ export default function Dashboard({
               participants={drawingState.participants}
               onDayClick={setSelectedDay}
               onImageClick={handleImageView}
+              isAdmin={currentUser.isAdmin}
+              onAdminUploadClick={handleAdminUploadClick}
             />
           </motion.div>
 
-          {/* Right: Draw Panel and Info */}
           <div className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -246,7 +371,6 @@ export default function Dashboard({
         onOpenChange={setShowSettings}
         settings={drawingState.settings || { soundEnabled: true, confettiEnabled: true }}
         onUpdateSettings={(settings) => {
-          // Settings are stored locally in localStorage
           localStorage.setItem("userSettings", JSON.stringify(settings))
         }}
       />
@@ -255,7 +379,7 @@ export default function Dashboard({
         open={showImageUpload}
         onClose={() => setShowImageUpload(false)}
         onUpload={handleImageUpload}
-        winnerName={currentUser.name}
+        winnerName={getWinnerName()}
         day={uploadDay || currentDay}
       />
 
