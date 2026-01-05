@@ -36,18 +36,22 @@ export default function Home() {
       // Check for saved user in localStorage (session management)
       const savedUser = localStorage.getItem("currentUser")
       if (savedUser) {
-        const user = JSON.parse(savedUser)
-        setCurrentUser(user)
+        const savedUserData = JSON.parse(savedUser)
+        const updatedUser = state.participants.find((p) => p.id === savedUserData.id)
+        if (updatedUser) {
+          setCurrentUser(updatedUser)
+          localStorage.setItem("currentUser", JSON.stringify(updatedUser))
 
-        // Check if user needs to see today's animation
-        const currentDay = getCurrentDay()
-        const todayWinner = state.winnersByDay[currentDay]
+          // Check if user needs to see today's animation
+          const currentDay = getCurrentDay()
+          const todayWinner = state.winnersByDay[currentDay]
 
-        if (todayWinner) {
-          const hasViewed = await hasUserViewedDraw(user.id, currentDay)
-          if (!hasViewed) {
-            setPendingWinner(todayWinner)
-            setShowLoginAnimation(true)
+          if (todayWinner) {
+            const hasViewed = await hasUserViewedDraw(updatedUser.id, currentDay)
+            if (!hasViewed) {
+              setPendingWinner(todayWinner)
+              setShowLoginAnimation(true)
+            }
           }
         }
       }

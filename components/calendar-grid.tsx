@@ -39,6 +39,32 @@ export default function CalendarGrid({
     return "past"
   }
 
+  const handleDayClick = (day: number, status: string, winner: any, dayImage: string | undefined) => {
+    const isFuture = status === "future"
+
+    if (isFuture) return
+
+    console.log("[v0] Day click:", { day, isAdmin, winner: winner?.name, hasImage: !!dayImage, status })
+
+    // Admin kann immer auf vergangene/heutige Tage mit Gewinner klicken um Bild hochzuladen
+    if (isAdmin && winner && onAdminUploadClick) {
+      console.log("[v0] Admin upload for day", day)
+      onAdminUploadClick(day)
+      return
+    }
+
+    // Normale User: Bild anschauen wenn vorhanden
+    if (dayImage && onImageClick) {
+      console.log("[v0] View image for day", day)
+      onImageClick(day)
+      return
+    }
+
+    // Fallback: normaler Day-Click
+    console.log("[v0] Normal day click for day", day)
+    onDayClick(day)
+  }
+
   return (
     <Card className="p-4 md:p-6 bg-white/90 backdrop-blur-sm shadow-xl border-2 border-[#0f3d2e]/10">
       <h2 className="text-2xl font-bold text-[#0f3d2e] mb-6">Adventskalender</h2>
@@ -51,28 +77,18 @@ export default function CalendarGrid({
           const isToday = status === "today"
           const isPast = status === "past"
           const isFuture = status === "future"
-          const canAdminUpload = isAdmin && !isFuture && winner && !dayImage
+          const showAdminIndicator = isAdmin && !isFuture && winner
 
           return (
             <motion.button
               key={day}
-              onClick={() => {
-                if (!isFuture) {
-                  if (dayImage && onImageClick) {
-                    onImageClick(day)
-                  } else if (canAdminUpload && onAdminUploadClick) {
-                    onAdminUploadClick(day)
-                  } else {
-                    onDayClick(day)
-                  }
-                }
-              }}
+              onClick={() => handleDayClick(day, status, winner, dayImage)}
               className={`
                 relative aspect-square rounded-lg flex flex-col items-center justify-center overflow-hidden
                 transition-all duration-300 cursor-pointer
                 ${isFuture ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-lg"}
                 ${isToday ? "ring-4 ring-[#b52b3b] ring-offset-2" : ""}
-                ${canAdminUpload ? "ring-2 ring-[#b52b3b]/50 ring-offset-1" : ""}
+                ${showAdminIndicator ? "ring-2 ring-[#b52b3b]/50 ring-offset-1" : ""}
               `}
               style={{
                 backgroundColor: isPast && winner ? winner.color : isFuture ? "#e5e5e5" : "#f5e6c8",

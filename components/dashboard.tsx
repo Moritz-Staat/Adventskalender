@@ -137,7 +137,7 @@ export default function Dashboard({
       const cols = 5
       const rows = Math.ceil(images.length / cols)
       const cellSize = 400
-      const padding = 20
+      const padding = 6 // Viel dünnere Ränder
       const canvas = document.createElement("canvas")
       const ctx = canvas.getContext("2d")
 
@@ -149,8 +149,24 @@ export default function Dashboard({
       canvas.width = cols * cellSize + (cols + 1) * padding
       canvas.height = rows * cellSize + (rows + 1) * padding
 
-      ctx.fillStyle = "#f5e6c8"
+      // Warmer weihnachtlicher Hintergrund mit Farbverlauf
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+      gradient.addColorStop(0, "#8B2635") // Dunkles Weihnachtsrot
+      gradient.addColorStop(0.5, "#0f3d2e") // Tannengrün
+      gradient.addColorStop(1, "#5C4033") // Warmes Braun
+      ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      // Subtiles Schnee-Muster hinzufügen
+      ctx.fillStyle = "rgba(255, 255, 255, 0.03)"
+      for (let i = 0; i < 500; i++) {
+        const x = Math.random() * canvas.width
+        const y = Math.random() * canvas.height
+        const size = Math.random() * 3
+        ctx.beginPath()
+        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.fill()
+      }
 
       const loadImage = (src: string): Promise<HTMLImageElement> => {
         return new Promise((resolve, reject) => {
@@ -173,9 +189,18 @@ export default function Dashboard({
           const loadedImg = await loadImage(img.imageUrl)
 
           ctx.save()
-          ctx.fillStyle = "#ffffff"
-          ctx.fillRect(x, y, cellSize, cellSize)
 
+          // Weißer Rahmen um das Bild (Polaroid-Stil)
+          ctx.fillStyle = "#ffffff"
+          ctx.shadowColor = "rgba(0, 0, 0, 0.3)"
+          ctx.shadowBlur = 15
+          ctx.shadowOffsetX = 5
+          ctx.shadowOffsetY = 5
+          ctx.fillRect(x - 8, y - 8, cellSize + 16, cellSize + 16)
+
+          ctx.shadowColor = "transparent"
+
+          // Bild mit Cover-Fit
           const aspectRatio = loadedImg.width / loadedImg.height
           let drawWidth = cellSize
           let drawHeight = cellSize
@@ -192,21 +217,28 @@ export default function Dashboard({
 
           ctx.drawImage(loadedImg, x + offsetX, y + offsetY, drawWidth, drawHeight)
 
-          ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
-          ctx.fillRect(x, y, 60, 40)
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 24px sans-serif"
-          ctx.textAlign = "center"
-          ctx.textBaseline = "middle"
-          ctx.fillText(img.day.toString(), x + 30, y + 20)
+          // Elegante goldene Zahl in der Ecke (wie auf einem Adventskalender-Türchen)
+          const numSize = 70
+          const numPadding = 12
 
-          ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
-          ctx.fillRect(x, y + cellSize - 40, cellSize, 40)
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 18px sans-serif"
+          // Goldener Kreis-Hintergrund
+          ctx.fillStyle = "#D4AF37" // Gold
+          ctx.beginPath()
+          ctx.arc(x + numPadding + numSize / 2, y + numPadding + numSize / 2, numSize / 2, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Dunkelroter Innenkreis
+          ctx.fillStyle = "#8B2635"
+          ctx.beginPath()
+          ctx.arc(x + numPadding + numSize / 2, y + numPadding + numSize / 2, numSize / 2 - 4, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Elegante Serif-Schrift für die Zahl
+          ctx.fillStyle = "#f5e6c8" // Cremeweiß
+          ctx.font = "bold 36px Georgia, serif"
           ctx.textAlign = "center"
           ctx.textBaseline = "middle"
-          ctx.fillText(img.winner, x + cellSize / 2, y + cellSize - 20)
+          ctx.fillText(img.day.toString(), x + numPadding + numSize / 2, y + numPadding + numSize / 2 + 2)
 
           ctx.restore()
         } catch (error) {
