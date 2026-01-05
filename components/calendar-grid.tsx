@@ -42,26 +42,22 @@ export default function CalendarGrid({
   const handleDayClick = (day: number, status: string, winner: any, dayImage: string | undefined) => {
     const isFuture = status === "future"
 
-    if (isFuture) return
-
-    console.log("[v0] Day click:", { day, isAdmin, winner: winner?.name, hasImage: !!dayImage, status })
-
-    // Admin kann immer auf vergangene/heutige Tage mit Gewinner klicken um Bild hochzuladen
+    // Admin kann alle Tage mit Gewinner anklicken
     if (isAdmin && winner && onAdminUploadClick) {
-      console.log("[v0] Admin upload for day", day)
       onAdminUploadClick(day)
       return
     }
 
-    // Normale User: Bild anschauen wenn vorhanden
+    // Normale User: Nur vergangene Tage mit Bild
+    if (isFuture) {
+      return
+    }
+
     if (dayImage && onImageClick) {
-      console.log("[v0] View image for day", day)
       onImageClick(day)
       return
     }
 
-    // Fallback: normaler Day-Click
-    console.log("[v0] Normal day click for day", day)
     onDayClick(day)
   }
 
@@ -77,32 +73,36 @@ export default function CalendarGrid({
           const isToday = status === "today"
           const isPast = status === "past"
           const isFuture = status === "future"
-          const showAdminIndicator = isAdmin && !isFuture && winner
+          const isClickable = isAdmin ? !!winner : !isFuture && !!dayImage
+          const showAdminIndicator = isAdmin && winner
 
           return (
             <motion.button
               key={day}
-              onClick={() => handleDayClick(day, status, winner, dayImage)}
+              onClick={() => {
+                handleDayClick(day, status, winner, dayImage)
+              }}
               className={`
                 relative aspect-square rounded-lg flex flex-col items-center justify-center overflow-hidden
-                transition-all duration-300 cursor-pointer
-                ${isFuture ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-lg"}
+                transition-all duration-300
+                ${isClickable ? "cursor-pointer hover:scale-105 hover:shadow-lg" : ""}
+                ${!isClickable ? "opacity-50 cursor-not-allowed" : ""}
                 ${isToday ? "ring-4 ring-[#b52b3b] ring-offset-2" : ""}
                 ${showAdminIndicator ? "ring-2 ring-[#b52b3b]/50 ring-offset-1" : ""}
               `}
               style={{
                 backgroundColor: isPast && winner ? winner.color : isFuture ? "#e5e5e5" : "#f5e6c8",
               }}
-              whileHover={!isFuture ? { y: -4 } : {}}
-              whileTap={!isFuture ? { scale: 0.95 } : {}}
-              disabled={isFuture}
+              whileHover={isClickable ? { y: -4 } : {}}
+              whileTap={isClickable ? { scale: 0.95 } : {}}
+              disabled={!isClickable}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: day * 0.02 }}
             >
               {dayImage && (
                 <div
-                  className="absolute inset-0 bg-cover bg-center cursor-zoom-in"
+                  className="absolute inset-0 bg-cover bg-center cursor-zoom-in z-0"
                   style={{
                     backgroundImage: `url(${dayImage})`,
                   }}
@@ -113,7 +113,7 @@ export default function CalendarGrid({
 
               {isToday && (
                 <motion.div
-                  className="absolute -top-1 -right-1 z-10"
+                  className="absolute -top-1 -right-1 z-20"
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                 >
@@ -129,19 +129,19 @@ export default function CalendarGrid({
                 {day}
               </span>
 
-              {!dayImage && winner && !isFuture && (
-                <div className="absolute inset-0 flex items-center justify-center z-5">
+              {!dayImage && winner && (
+                <div className="absolute inset-0 flex items-center justify-center z-5 pointer-events-none">
                   <span className="text-white text-xs md:text-sm font-bold drop-shadow-lg text-center px-1">
                     {winner.name}
                   </span>
                 </div>
               )}
 
-              {isFuture && <Lock className="relative z-10 w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
+              {!winner && isFuture && <Lock className="relative z-10 w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
 
               {isPast && winner && (
                 <div
-                  className="absolute bottom-1 right-1 z-10 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/90 flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md"
+                  className="absolute bottom-1 right-1 z-10 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/90 flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md pointer-events-none"
                   style={{ color: winner.color }}
                 >
                   {winner.name.charAt(0)}

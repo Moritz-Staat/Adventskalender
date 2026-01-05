@@ -15,8 +15,9 @@ export function getCurrentDay(): number {
     return date
   }
 
-  // For testing purposes, return day 1 if not in December
-  return 1
+  // For testing purposes outside December, simulate current day based on actual date
+  // This allows testing the calendar functionality year-round
+  return Math.min(date, 25)
 }
 
 export function getMonthName(month: number): string {
