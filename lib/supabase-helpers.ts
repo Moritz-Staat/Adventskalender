@@ -34,6 +34,7 @@ export async function getParticipants(): Promise<Participant[]> {
     id: p.id,
     name: p.name,
     color: PARTICIPANT_COLORS[p.id] || "#0f3d2e",
+    isAdmin: p.id === "moritz", // Mark Moritz as admin
   }))
 }
 
@@ -184,4 +185,26 @@ export async function uploadImageToStorage(day: number, file: File): Promise<str
   } = supabase.storage.from("advent-images").getPublicUrl(fileName)
 
   return publicUrl
+}
+
+export async function getAllImages(): Promise<Array<{ day: number; imageUrl: string; winner: string }>> {
+  const supabase = createClient()
+  const { data: draws, error } = await supabase
+    .from("daily_draws")
+    .select("day, image_url, winner_id")
+    .not("image_url", "is", null)
+    .order("day")
+
+  if (error) throw error
+
+  const participants = await getParticipants()
+
+  return (draws || []).map((draw) => {
+    const winner = participants.find((p) => p.id === draw.winner_id)
+    return {
+      day: draw.day,
+      imageUrl: draw.image_url!,
+      winner: winner?.name || "Unknown",
+    }
+  })
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { LogOut, Settings } from "lucide-react"
+import { LogOut, Settings, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import CalendarGrid from "@/components/calendar-grid"
@@ -15,6 +15,8 @@ import ImageUploadModal from "@/components/image-upload-modal"
 import { ImageViewerModal } from "@/components/image-viewer-modal"
 import type { Participant, DrawingState } from "@/lib/types"
 import { getCurrentDay, getMonthName } from "@/lib/utils"
+import { getAllImages } from "@/lib/supabase-helpers"
+import JSZip from "jszip"
 
 interface DashboardProps {
   currentUser: Participant
@@ -79,6 +81,45 @@ export default function Dashboard({
     }
   }
 
+  const handleDownloadAllImages = async () => {
+    try {
+      const images = await getAllImages()
+
+      if (images.length === 0) {
+        alert("Keine Bilder zum Herunterladen verfügbar.")
+        return
+      }
+
+      const zip = new JSZip()
+
+      // Download all images and add to ZIP
+      for (const img of images) {
+        try {
+          const response = await fetch(img.imageUrl)
+          const blob = await response.blob()
+          const extension = img.imageUrl.includes("data:image/") ? "jpg" : img.imageUrl.split(".").pop() || "jpg"
+          zip.file(`Tag_${img.day}_${img.winner}.${extension}`, blob)
+        } catch (error) {
+          console.error(`[v0] Error downloading image for day ${img.day}:`, error)
+        }
+      }
+
+      // Generate ZIP and download
+      const content = await zip.generateAsync({ type: "blob" })
+      const url = URL.createObjectURL(content)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Adventskalender_Bilder_${new Date().getFullYear()}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("[v0] Error downloading images:", error)
+      alert("Fehler beim Herunterladen der Bilder.")
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
       <Snowfall />
@@ -117,6 +158,12 @@ export default function Dashboard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                {currentUser.isAdmin && (
+                  <DropdownMenuItem onClick={handleDownloadAllImages}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Alle Bilder herunterladen
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setShowSettings(true)}>
                   <Settings className="w-4 h-4 mr-2" />
                   Einstellungen

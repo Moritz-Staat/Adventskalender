@@ -2,6 +2,7 @@ export interface Participant {
   id: string
   name: string
   color?: string // Optional since colors are UI-only, not stored in DB
+  isAdmin?: boolean // Added isAdmin flag for admin privileges
 }
 
 export interface Settings {
