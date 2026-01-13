@@ -27,14 +27,30 @@ const PARTICIPANT_COLORS: Record<string, string> = {
 // Teilnehmer aus Datenbank holen
 export async function getParticipants(): Promise<Participant[]> {
   const supabase = createClient()
-  const { data, error } = await supabase.from("participants").select("*").order("name")
+  const { data, error } = await supabase
+    .from("participants")
+    .select("*")
+    .eq("is_active", true) // Only active participants
+    .order("name")
 
   if (error) throw error
-  return data.map((p) => ({
+
+  const storedCredentials = localStorage.getItem("familyCredentials")
+  let adminId: string | null = null
+
+  if (storedCredentials) {
+    const credentials = JSON.parse(storedCredentials)
+    const adminCred = credentials.find((c: any) => c.isAdmin)
+    if (adminCred) {
+      adminId = adminCred.name.toLowerCase().replace(/\s+/g, "_")
+    }
+  }
+
+  return data.map((p, index) => ({
     id: p.id,
     name: p.name,
-    color: PARTICIPANT_COLORS[p.id] || "#0f3d2e",
-    isAdmin: p.id === "moritz", // Mark Moritz as admin
+    color: PARTICIPANT_COLORS[p.id] || getColorByIndex(index),
+    isAdmin: p.id === adminId,
   }))
 }
 
@@ -207,4 +223,21 @@ export async function getAllImages(): Promise<Array<{ day: number; imageUrl: str
       winner: winner?.name || "Unknown",
     }
   })
+}
+
+export async function checkSetupStatus(): Promise<boolean> {
+  const supabase = createClient()
+  const { data, error } = await supabase.from("app_setup").select("is_setup_complete").eq("id", 1).maybeSingle()
+
+  if (error) {
+    console.error("Error checking setup status:", error)
+    return false
+  }
+
+  return data?.is_setup_complete ?? false
+}
+
+function getColorByIndex(index: number): string {
+  const colors = ["#0f3d2e", "#b52b3b", "#d4a574", "#8b3a3a", "#2d5f4f", "#7a2d2d"]
+  return colors[index % colors.length]
 }

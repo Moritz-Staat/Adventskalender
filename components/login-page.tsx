@@ -30,15 +30,28 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
       return
     }
 
-    const user = drawingState.participants.find((p) => p.name.toLowerCase() === username.toLowerCase())
-
-    if (user && password.toLowerCase() === user.name.toLowerCase()) {
-      onLogin(user)
-    } else {
-      setError("Benutzername oder Passwort falsch")
-      setIsShaking(true)
-      setTimeout(() => setIsShaking(false), 500)
+    const storedCredentials = localStorage.getItem("familyCredentials")
+    if (!storedCredentials) {
+      setError("Keine Anmeldedaten gefunden. Bitte kontaktiere den Administrator.")
+      return
     }
+
+    const credentials = JSON.parse(storedCredentials)
+    const credential = credentials.find(
+      (c: any) => c.name.toLowerCase() === username.toLowerCase() && c.password === password,
+    )
+
+    if (credential) {
+      const user = drawingState.participants.find((p) => p.name.toLowerCase() === username.toLowerCase())
+      if (user) {
+        onLogin(user)
+        return
+      }
+    }
+
+    setError("Benutzername oder Passwort falsch")
+    setIsShaking(true)
+    setTimeout(() => setIsShaking(false), 500)
   }
 
   return (
@@ -57,9 +70,7 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
                 <Gift className="w-8 h-8 text-[#f5e6c8]" />
               </motion.div>
               <CardTitle className="text-3xl font-bold text-[#0f3d2e]">Familien-Adventskalender</CardTitle>
-              <CardDescription className="text-base text-[#0f3d2e]/70">
-                Melde dich mit deinem Vornamen an (Moritz, Claudia, Christian, Ella, Clara)
-              </CardDescription>
+              <CardDescription className="text-base text-[#0f3d2e]/70">Melde dich mit deinem Namen an</CardDescription>
             </CardHeader>
 
             <CardContent>
@@ -76,7 +87,7 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
                       setUsername(e.target.value)
                       setError("")
                     }}
-                    placeholder="Dein Vorname"
+                    placeholder="Dein Name"
                     className="border-[#0f3d2e]/20 focus:border-[#0f3d2e] focus:ring-[#0f3d2e]"
                     required
                   />
@@ -94,7 +105,7 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
                       setPassword(e.target.value)
                       setError("")
                     }}
-                    placeholder="Dein Vorname"
+                    placeholder="Dein Passwort"
                     className="border-[#0f3d2e]/20 focus:border-[#0f3d2e] focus:ring-[#0f3d2e]"
                     required
                   />

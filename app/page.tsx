@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import LoginPage from "@/components/login-page"
+import SetupPage from "@/components/setup-page"
 import Dashboard from "@/components/dashboard"
 import WheelModal from "@/components/wheel-modal"
 import type { Participant, DrawingState } from "@/lib/types"
@@ -13,6 +14,7 @@ import {
   performDraw as performSupabaseDraw,
   uploadDrawImage,
   uploadImageToStorage,
+  checkSetupStatus,
 } from "@/lib/supabase-helpers"
 
 export default function Home() {
@@ -21,6 +23,7 @@ export default function Home() {
   const [showLoginAnimation, setShowLoginAnimation] = useState(false)
   const [pendingWinner, setPendingWinner] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSetupComplete, setIsSetupComplete] = useState<boolean | null>(null)
 
   useEffect(() => {
     loadData()
@@ -29,11 +32,17 @@ export default function Home() {
   const loadData = async () => {
     try {
       setIsLoading(true)
-      // Load drawing state from Supabase
+      const setupComplete = await checkSetupStatus()
+      setIsSetupComplete(setupComplete)
+
+      if (!setupComplete) {
+        setIsLoading(false)
+        return
+      }
+
       const state = await getDrawingState()
       setDrawingState(state)
 
-      // Check for saved user in localStorage (session management)
       const savedUser = localStorage.getItem("currentUser")
       if (savedUser) {
         const savedUserData = JSON.parse(savedUser)
@@ -42,7 +51,6 @@ export default function Home() {
           setCurrentUser(updatedUser)
           localStorage.setItem("currentUser", JSON.stringify(updatedUser))
 
-          // Check if user needs to see today's animation
           const currentDay = getCurrentDay()
           const todayWinner = state.winnersByDay[currentDay]
 
@@ -112,7 +120,6 @@ export default function Home() {
 
     await markDrawAsViewed(currentUser.id, currentDay)
 
-    // Reload state
     await reloadDrawingState()
   }
 
@@ -126,6 +133,10 @@ export default function Home() {
     }
   }
 
+  const handleSetupComplete = async () => {
+    await loadData()
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
@@ -135,6 +146,10 @@ export default function Home() {
         </div>
       </div>
     )
+  }
+
+  if (isSetupComplete === false) {
+    return <SetupPage onSetupComplete={handleSetupComplete} />
   }
 
   if (!currentUser || !drawingState) {
