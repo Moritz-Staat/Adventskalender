@@ -25,3 +25,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# impeccable: lokale Review-Screenshots und Entscheidungs-Logs
+.impeccable/review/
+.impeccable/questions/

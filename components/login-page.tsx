@@ -4,10 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Gift } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Awning, MarqueeSign, TreeMark } from "@/components/booth"
 import type { Participant, DrawingState } from "@/lib/types"
 import Snowfall from "@/components/snowfall"
 
@@ -54,85 +51,101 @@ export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
     setTimeout(() => setIsShaking(false), 500)
   }
 
+  const fieldClass =
+    "h-12 w-full rounded-xl border-2 border-ink/15 bg-white/55 px-4 text-base font-medium text-ink placeholder:text-ink/45 outline-none transition-[border-color,background-color] focus:border-ink/60 focus:bg-white/80"
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8] flex items-center justify-center p-4">
+    <div className="relative flex min-h-dvh flex-col overflow-x-hidden">
       <Snowfall />
+      <Awning className="relative z-10" />
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <Card className="w-full max-w-md shadow-2xl border-2 border-[#0f3d2e]/10">
-          <motion.div animate={isShaking ? { x: [-10, 10, -10, 10, 0] } : {}} transition={{ duration: 0.4 }}>
-            <CardHeader className="text-center space-y-4">
-              <motion.div
-                className="mx-auto w-16 h-16 bg-gradient-to-br from-[#0f3d2e] to-[#2d5f4f] rounded-full flex items-center justify-center"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <Gift className="w-8 h-8 text-[#f5e6c8]" />
-              </motion.div>
-              <CardTitle className="text-3xl font-bold text-[#0f3d2e]">Familien-Adventskalender</CardTitle>
-              <CardDescription className="text-base text-[#0f3d2e]/70">Melde dich mit deinem Namen an</CardDescription>
-            </CardHeader>
+      <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-6 pb-12 md:justify-center md:pt-0 md:pb-24">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md"
+        >
+          <MarqueeSign className="pt-8 pb-9 text-center" bulbs={12}>
+            <TreeMark className="mx-auto h-12 w-12 text-[#2f6b4f]" />
+            <h1 className="sign-text mt-3 leading-[0.95]">
+              <span className="block text-lg">Familien-</span>
+              <span className="block text-[clamp(1.9rem,9vw,2.6rem)]">Adventskalender</span>
+            </h1>
+          </MarqueeSign>
 
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="username" className="text-sm font-medium text-[#0f3d2e]">
+          {/* Eintrittskarte */}
+          <motion.div
+            animate={isShaking ? { x: [-10, 10, -8, 8, 0] } : {}}
+            transition={{ duration: 0.4 }}
+            className="mt-4 px-2"
+          >
+            <div className="ticket ticket-paper relative bg-cream px-6 pt-6 pb-7 shadow-[0_20px_40px_-16px_rgb(0_0_0/0.7)] [--notch:12px]">
+              <h2 className="text-center text-lg font-bold text-ink">Melde dich mit deinem Namen an</h2>
+
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="username" className="text-sm font-semibold text-ink">
                     Benutzername
                   </label>
-                  <Input
+                  <input
                     id="username"
                     type="text"
+                    autoComplete="username"
+                    autoCapitalize="words"
                     value={username}
                     onChange={(e) => {
                       setUsername(e.target.value)
                       setError("")
                     }}
                     placeholder="Dein Name"
-                    className="border-[#0f3d2e]/20 focus:border-[#0f3d2e] focus:ring-[#0f3d2e]"
+                    className={fieldClass}
+                    aria-invalid={!!error}
                     required
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-[#0f3d2e]">
+                <div className="space-y-1.5">
+                  <label htmlFor="password" className="text-sm font-semibold text-ink">
                     Passwort
                   </label>
-                  <Input
+                  <input
                     id="password"
                     type="password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value)
                       setError("")
                     }}
                     placeholder="Dein Passwort"
-                    className="border-[#0f3d2e]/20 focus:border-[#0f3d2e] focus:ring-[#0f3d2e]"
+                    className={fieldClass}
+                    aria-invalid={!!error}
                     required
                   />
                 </div>
 
                 {error && (
                   <motion.p
+                    role="alert"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-sm text-[#b52b3b] font-medium"
+                    className="text-sm font-semibold text-awning-deep"
                   >
                     {error}
                   </motion.p>
                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#0f3d2e] to-[#2d5f4f] hover:from-[#2d5f4f] hover:to-[#0f3d2e] text-white transition-all duration-300"
-                  size="lg"
-                >
-                  Anmelden
-                </Button>
+                <div className="border-t-2 border-dashed border-ink/20 pt-5">
+                  <button type="submit" className="booth-button h-14 w-full text-lg">
+                    Anmelden
+                  </button>
+                </div>
               </form>
-            </CardContent>
+            </div>
           </motion.div>
-        </Card>
-      </motion.div>
+        </motion.div>
+      </main>
     </div>
   )
 }

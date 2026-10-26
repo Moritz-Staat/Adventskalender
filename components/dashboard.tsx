@@ -1,9 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
-import { LogOut, Settings, Download, ImageIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { LogOut, Settings as SettingsIcon, Download, ImageIcon } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import CalendarGrid from "@/components/calendar-grid"
 import DrawPanel from "@/components/draw-panel"
@@ -13,17 +11,20 @@ import SettingsDialog from "@/components/settings-dialog"
 import Snowfall from "@/components/snowfall"
 import ImageUploadModal from "@/components/image-upload-modal"
 import { ImageViewerModal } from "@/components/image-viewer-modal"
-import type { Participant, DrawingState } from "@/lib/types"
-import { getCurrentDay, getMonthName } from "@/lib/utils"
+import { Awning, MarqueeSign, NameStamp, TreeMark } from "@/components/booth"
+import type { Participant, DrawingState, Settings } from "@/lib/types"
+import { getCurrentDay } from "@/lib/utils"
 import { getAllImages } from "@/lib/supabase-helpers"
 import JSZip from "jszip"
+import { toast } from "sonner"
 
 interface DashboardProps {
   currentUser: Participant
   drawingState: DrawingState
   onLogout: () => void
   onUpdateState: () => void
-  onNewDraw: (winnerId: string) => void
+  onPerformDraw: () => Promise<string>
+  onDrawRevealed: () => Promise<void>
   onImageUpload: (day: number, file: File) => Promise<void>
 }
 
@@ -32,9 +33,13 @@ export default function Dashboard({
   drawingState,
   onLogout,
   onUpdateState,
-  onNewDraw,
+  onPerformDraw,
+  onDrawRevealed,
   onImageUpload,
 }: DashboardProps) {
+  const [settings, setSettings] = useState<Settings>(
+    drawingState.settings || { soundEnabled: true, confettiEnabled: true },
+  )
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showImageUpload, setShowImageUpload] = useState(false)
@@ -46,7 +51,7 @@ export default function Dashboard({
     winner: "",
   })
   const currentDay = getCurrentDay()
-  const today = new Date()
+  const todayLabel = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })
 
   const todayWinner = drawingState.winnersByDay[currentDay]
   const needsImageUpload = todayWinner === currentUser.id && !drawingState.imagesByDay[currentDay]
@@ -93,7 +98,7 @@ export default function Dashboard({
       const images = await getAllImages()
 
       if (images.length === 0) {
-        alert("Keine Bilder zum Herunterladen verfügbar.")
+        toast("Noch keine Fotos zum Herunterladen.")
         return
       }
 
@@ -121,7 +126,7 @@ export default function Dashboard({
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error("[v0] Error downloading images:", error)
-      alert("Fehler beim Herunterladen der Bilder.")
+      toast.error("Download fehlgeschlagen. Bitte versuch es noch einmal.")
     }
   }
 
@@ -130,7 +135,7 @@ export default function Dashboard({
       const images = await getAllImages()
 
       if (images.length === 0) {
-        alert("Keine Bilder zum Herunterladen verfügbar.")
+        toast("Noch keine Fotos zum Herunterladen.")
         return
       }
 
@@ -142,7 +147,7 @@ export default function Dashboard({
       const ctx = canvas.getContext("2d")
 
       if (!ctx) {
-        alert("Canvas wird nicht unterstützt.")
+        toast.error("Dein Browser kann keine Collage erstellen.")
         return
       }
 
@@ -151,9 +156,9 @@ export default function Dashboard({
 
       // Warmer weihnachtlicher Hintergrund mit Farbverlauf
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
-      gradient.addColorStop(0, "#8B2635") // Dunkles Weihnachtsrot
-      gradient.addColorStop(0.5, "#0f3d2e") // Tannengrün
-      gradient.addColorStop(1, "#5C4033") // Warmes Braun
+      gradient.addColorStop(0, "#3a1610") // Budenholz
+      gradient.addColorStop(0.5, "#1a0f0d") // Budennacht
+      gradient.addColorStop(1, "#8f1424") // Markisenrot
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -222,19 +227,19 @@ export default function Dashboard({
           const numPadding = 12
 
           // Goldener Kreis-Hintergrund
-          ctx.fillStyle = "#D4AF37" // Gold
+          ctx.fillStyle = "#e8b03a" // Messing
           ctx.beginPath()
           ctx.arc(x + numPadding + numSize / 2, y + numPadding + numSize / 2, numSize / 2, 0, Math.PI * 2)
           ctx.fill()
 
           // Dunkelroter Innenkreis
-          ctx.fillStyle = "#8B2635"
+          ctx.fillStyle = "#c41e32"
           ctx.beginPath()
           ctx.arc(x + numPadding + numSize / 2, y + numPadding + numSize / 2, numSize / 2 - 4, 0, Math.PI * 2)
           ctx.fill()
 
           // Elegante Serif-Schrift für die Zahl
-          ctx.fillStyle = "#f5e6c8" // Cremeweiß
+          ctx.fillStyle = "#f4ead6" // Creme
           ctx.font = "bold 36px Georgia, serif"
           ctx.textAlign = "center"
           ctx.textBaseline = "middle"
@@ -260,7 +265,7 @@ export default function Dashboard({
       })
     } catch (error) {
       console.error("[v0] Error creating collage:", error)
-      alert("Fehler beim Erstellen der Collage.")
+      toast.error("Collage konnte nicht erstellt werden. Bitte versuch es noch einmal.")
     }
   }
 
@@ -274,75 +279,79 @@ export default function Dashboard({
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
+    <div className="relative min-h-dvh overflow-x-hidden">
       <Snowfall />
 
-      <motion.header
-        className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#0f3d2e]/10 shadow-sm"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#0f3d2e] to-[#2d5f4f] rounded-full flex items-center justify-center">
-                <span className="text-xl">🎄</span>
-              </div>
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-[#0f3d2e]">Familien-Adventskalender</h1>
-                <p className="text-sm text-[#0f3d2e]/70">
-                  Heute ist der {today.getDate()}. {getMonthName(today.getMonth())}
-                </p>
+      <header className="relative z-10">
+        <Awning />
+        <div className="mx-auto -mt-1 max-w-6xl px-4 md:px-8">
+          <MarqueeSign className="pt-7 pb-8 md:px-10" bulbs={16}>
+            <div className="flex items-center gap-4 md:gap-6">
+              <TreeMark className="hidden h-16 w-16 shrink-0 text-[#2f6b4f] md:block" />
+              <div className="min-w-0 flex-1">
+                <h1 className="sign-text leading-[0.95]">
+                  <span className="flex items-center gap-1.5 text-[15px] tracking-wide md:text-xl">
+                    <TreeMark className="h-6 w-6 text-[#2f6b4f] md:hidden" />
+                    Familien-
+                  </span>
+                  <span className="block text-[clamp(1.6rem,7.7vw,3rem)] whitespace-nowrap">Adventskalender</span>
+                </h1>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <p className="text-sm text-cream-dim md:text-base">Heute ist {todayLabel}</p>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      className="-my-1 flex shrink-0 items-center gap-2 rounded-xl p-1 transition-transform active:translate-y-px"
+                      aria-label={`Menü für ${currentUser.name}`}
+                    >
+                      <span className="hidden font-semibold text-cream md:inline">{currentUser.name}</span>
+                      <NameStamp name={currentUser.name} color={currentUser.color} />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 border-plank-edge bg-night-2 p-1.5">
+                      {currentUser.isAdmin && (
+                        <>
+                          <DropdownMenuItem onClick={handleDownloadAllImages} className="py-2.5">
+                            <Download className="mr-1 h-4 w-4" />
+                            Als ZIP herunterladen
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleDownloadCollage} className="py-2.5">
+                            <ImageIcon className="mr-1 h-4 w-4" />
+                            Als Collage herunterladen
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      <DropdownMenuItem onClick={() => setShowSettings(true)} className="py-2.5">
+                        <SettingsIcon className="mr-1 h-4 w-4" />
+                        Einstellungen
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={onLogout} variant="destructive" className="py-2.5">
+                        <LogOut className="mr-1 h-4 w-4" />
+                        Abmelden
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 hover:bg-[#0f3d2e]/5">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                    style={{ backgroundColor: currentUser.color }}
-                  >
-                    {currentUser.name.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="hidden md:inline text-[#0f3d2e] font-medium">{currentUser.name}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {currentUser.isAdmin && (
-                  <>
-                    <DropdownMenuItem onClick={handleDownloadAllImages}>
-                      <Download className="w-4 h-4 mr-2" />
-                      Als ZIP herunterladen
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleDownloadCollage}>
-                      <ImageIcon className="w-4 h-4 mr-2" />
-                      Als Collage herunterladen
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Einstellungen
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onLogout} className="text-[#b52b3b]">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Abmelden
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          </MarqueeSign>
         </div>
-      </motion.header>
+      </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+      <main className="relative z-10 mx-auto max-w-6xl px-4 pt-6 pb-16 md:px-8 md:pt-10">
+        <div className="grid gap-x-6 gap-y-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-8 lg:gap-y-14">
+          <section aria-label="Heutige Auslosung" className="lg:col-start-1 lg:row-start-1 lg:self-start">
+            <DrawPanel
+              currentDay={currentDay}
+              currentUser={currentUser}
+              drawingState={drawingState}
+              settings={settings}
+              onPerformDraw={onPerformDraw}
+              onDrawRevealed={onDrawRevealed}
+              onRequestImageUpload={handleImageUploadPrompt}
+            />
+          </section>
+
+          <section aria-label="Gewinnertafel" className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
             <CalendarGrid
               currentDay={currentDay}
               winnersByDay={drawingState.winnersByDay}
@@ -353,57 +362,33 @@ export default function Dashboard({
               isAdmin={currentUser.isAdmin}
               onAdminUploadClick={handleAdminUploadClick}
             />
-          </motion.div>
+          </section>
 
-          <div className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <DrawPanel
-                currentDay={currentDay}
-                currentUser={currentUser}
-                drawingState={drawingState}
-                onUpdateState={onUpdateState}
-                onNewDraw={onNewDraw}
-                onRequestImageUpload={handleImageUploadPrompt}
-              />
-            </motion.div>
+          <section aria-label="Statistik" className="lg:col-start-1 lg:row-span-2 lg:row-start-2 lg:self-start">
+            <StatsPanel
+              participants={drawingState.participants}
+              winnersByDay={drawingState.winnersByDay}
+              currentCycleWinners={drawingState.currentCycleWinners}
+            />
+          </section>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <StatsPanel
-                participants={drawingState.participants}
-                winnersByDay={drawingState.winnersByDay}
-                currentCycleWinners={drawingState.currentCycleWinners}
-              />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <HistoryPanel
-                winnersByDay={drawingState.winnersByDay}
-                participants={drawingState.participants}
-                selectedDay={selectedDay}
-              />
-            </motion.div>
-          </div>
+          <section aria-label="Verlauf" className="lg:col-start-2 lg:row-start-3 lg:self-start">
+            <HistoryPanel
+              winnersByDay={drawingState.winnersByDay}
+              participants={drawingState.participants}
+              selectedDay={selectedDay}
+            />
+          </section>
         </div>
       </main>
 
       <SettingsDialog
         open={showSettings}
         onOpenChange={setShowSettings}
-        settings={drawingState.settings || { soundEnabled: true, confettiEnabled: true }}
-        onUpdateSettings={(settings) => {
-          localStorage.setItem("userSettings", JSON.stringify(settings))
+        settings={settings}
+        onUpdateSettings={(next) => {
+          setSettings(next)
+          localStorage.setItem("userSettings", JSON.stringify(next))
         }}
       />
 

@@ -1,0 +1,553 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T14:57:48+00:00",
+  "title": "Design System: Familien-Adventskalender",
+  "extensions": {
+    "colorMeta": {
+      "night": {
+        "role": "neutral",
+        "displayName": "Budennacht",
+        "canonical": "#1a0f0d",
+        "oklch": "oklch(18.3% 0.019 30.5)",
+        "tonalRamp": [
+          "#120807",
+          "#2e221f",
+          "#4c3e3c",
+          "#6c5d5b",
+          "#8e7e7b",
+          "#b1a19e",
+          "#d5c5c2",
+          "#fbeae7"
+        ]
+      },
+      "night-2": {
+        "role": "neutral",
+        "displayName": "Nacht 2",
+        "canonical": "#241512",
+        "oklch": "oklch(21.5% 0.026 31.7)",
+        "tonalRamp": [
+          "#140705",
+          "#30211e",
+          "#4e3e3a",
+          "#6d5d5a",
+          "#8e7e7b",
+          "#b0a19e",
+          "#d3c6c3",
+          "#f8ebe9"
+        ]
+      },
+      "plank": {
+        "role": "neutral",
+        "displayName": "Brett",
+        "canonical": "#321c17",
+        "oklch": "oklch(25.4% 0.036 33.5)",
+        "tonalRamp": [
+          "#170603",
+          "#351e19",
+          "#523c36",
+          "#725b56",
+          "#937d77",
+          "#b5a09b",
+          "#d8c4bf",
+          "#fceae5"
+        ]
+      },
+      "plank-edge": {
+        "role": "neutral",
+        "displayName": "Brettkante",
+        "canonical": "#4a2a22",
+        "oklch": "oklch(32.4% 0.050 34.8)",
+        "tonalRamp": [
+          "#1a0401",
+          "#391c14",
+          "#593930",
+          "#795850",
+          "#9a7a72",
+          "#bc9d95",
+          "#dfc2ba",
+          "#ffe8e1"
+        ]
+      },
+      "awning-red": {
+        "role": "primary",
+        "displayName": "Markisenrot",
+        "canonical": "#c41e32",
+        "oklch": "oklch(53.0% 0.197 22.2)",
+        "tonalRamp": [
+          "#350000",
+          "#5e0000",
+          "#89000c",
+          "#b50d29",
+          "#dc444c",
+          "#ff7172",
+          "#ff9b99",
+          "#ffc5c1"
+        ]
+      },
+      "awning-red-deep": {
+        "role": "primary",
+        "displayName": "Tiefes Markisenrot",
+        "canonical": "#8f1424",
+        "oklch": "oklch(42.1% 0.155 21.5)",
+        "tonalRamp": [
+          "#2f0000",
+          "#570001",
+          "#80011a",
+          "#a5333a",
+          "#c85c5d",
+          "#ea8381",
+          "#ffaaa8",
+          "#ffd2cf"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Creme",
+        "canonical": "#f4ead6",
+        "oklch": "oklch(94.0% 0.029 84.6)",
+        "tonalRamp": [
+          "#0e0b05",
+          "#29241c",
+          "#474137",
+          "#676054",
+          "#898273",
+          "#aca494",
+          "#d1c8b6",
+          "#f7edda"
+        ]
+      },
+      "cream-dim": {
+        "role": "neutral",
+        "displayName": "Creme gedämpft",
+        "canonical": "#c9b39c",
+        "oklch": "oklch(77.9% 0.041 68.4)",
+        "tonalRamp": [
+          "#120902",
+          "#2e2316",
+          "#4d3f30",
+          "#6e5e4d",
+          "#917f6b",
+          "#b6a18b",
+          "#dbc5ae",
+          "#ffebd5"
+        ]
+      },
+      "bulb": {
+        "role": "secondary",
+        "displayName": "Glühbirnenlicht",
+        "canonical": "#ffd27a",
+        "oklch": "oklch(88.5% 0.118 82.9)",
+        "tonalRamp": [
+          "#180600",
+          "#362000",
+          "#573d00",
+          "#7a5c19",
+          "#9f7c35",
+          "#c59f51",
+          "#edc26e",
+          "#ffe894"
+        ]
+      },
+      "bulb-core": {
+        "role": "secondary",
+        "displayName": "Birnenkern",
+        "canonical": "#fff4d6",
+        "oklch": "oklch(96.8% 0.041 90.2)",
+        "tonalRamp": [
+          "#0e0b03",
+          "#292518",
+          "#474232",
+          "#68614f",
+          "#8a826d",
+          "#ada58d",
+          "#d2c9ae",
+          "#f9eed0"
+        ]
+      },
+      "brass": {
+        "role": "secondary",
+        "displayName": "Messing",
+        "canonical": "#e8b03a",
+        "oklch": "oklch(78.9% 0.144 81.9)",
+        "tonalRamp": [
+          "#1c0300",
+          "#3c1d00",
+          "#5e3a00",
+          "#825800",
+          "#a87900",
+          "#d09b27",
+          "#f6bf52",
+          "#ffe684"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinte",
+        "canonical": "#2a1712",
+        "oklch": "oklch(22.9% 0.033 35.5)",
+        "tonalRamp": [
+          "#160604",
+          "#331f1a",
+          "#503d37",
+          "#705c57",
+          "#917d78",
+          "#b3a09b",
+          "#d6c5c0",
+          "#fbeae6"
+        ]
+      },
+      "destructive": {
+        "role": "neutral",
+        "displayName": "Fehler hell",
+        "canonical": "#ff8a7a",
+        "oklch": "oklch(75.8% 0.145 29.0)",
+        "tonalRamp": [
+          "#270000",
+          "#4b0403",
+          "#72241c",
+          "#9a4137",
+          "#c56053",
+          "#f18070",
+          "#ffa595",
+          "#ffcdbd"
+        ]
+      },
+      "ticket-mint": {
+        "role": "tertiary",
+        "displayName": "Los Minze",
+        "canonical": "#9fd9c3",
+        "oklch": "oklch(83.9% 0.067 169.3)",
+        "tonalRamp": [
+          "#001008",
+          "#0a2c21",
+          "#254a3e",
+          "#416b5c",
+          "#5f8e7d",
+          "#7eb29e",
+          "#9ed8c2",
+          "#c6fde7"
+        ]
+      },
+      "ticket-rose": {
+        "role": "tertiary",
+        "displayName": "Los Rosé",
+        "canonical": "#f4a7b5",
+        "oklch": "oklch(80.6% 0.092 7.4)",
+        "tonalRamp": [
+          "#1d0107",
+          "#3d1620",
+          "#60313b",
+          "#864f59",
+          "#ac6e79",
+          "#d58e9b",
+          "#fdb1be",
+          "#ffd8e4"
+        ]
+      },
+      "ticket-gold": {
+        "role": "tertiary",
+        "displayName": "Los Gold",
+        "canonical": "#f5d26a",
+        "oklch": "oklch(87.3% 0.129 91.0)",
+        "tonalRamp": [
+          "#160700",
+          "#342200",
+          "#543f00",
+          "#765e03",
+          "#9b7f28",
+          "#c1a244",
+          "#e8c661",
+          "#ffec8a"
+        ]
+      },
+      "ticket-sky": {
+        "role": "tertiary",
+        "displayName": "Los Himmel",
+        "canonical": "#a9c7f1",
+        "oklch": "oklch(82.2% 0.068 256.8)",
+        "tonalRamp": [
+          "#020b1c",
+          "#16263b",
+          "#31435c",
+          "#4d6380",
+          "#6c84a6",
+          "#8ca7cd",
+          "#aecbf5",
+          "#d4f1ff"
+        ]
+      },
+      "ticket-lilac": {
+        "role": "tertiary",
+        "displayName": "Los Flieder",
+        "canonical": "#cab4ee",
+        "oklch": "oklch(80.8% 0.084 301.9)",
+        "tonalRamp": [
+          "#0f051c",
+          "#2a1e3c",
+          "#483a5e",
+          "#685882",
+          "#8a78a8",
+          "#ae9acf",
+          "#d3bdf7",
+          "#f8e3ff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Budenschild",
+        "purpose": "App-Name auf dem Kopfschild."
+      },
+      "headline": {
+        "displayName": "Montiertes Schild",
+        "purpose": "Abschnitts- und Radtitel in Rye mit Extrusion."
+      },
+      "numeral": {
+        "displayName": "Türchenzahl",
+        "purpose": "Große Tageszahl, Tafel- und Protokollziffern."
+      },
+      "ticket-name": {
+        "displayName": "Losname",
+        "purpose": "Gewinnername auf dem Los."
+      },
+      "title": {
+        "displayName": "Status-Satz",
+        "purpose": "Bühnen- und Dialogtitel."
+      },
+      "body": {
+        "displayName": "Text",
+        "purpose": "Hinweise, Zähler, Loszeilen."
+      },
+      "label": {
+        "displayName": "Aufdruck",
+        "purpose": "Losaufdruck und datentragende Versalzeilen."
+      }
+    },
+    "shadows": [
+      {
+        "name": "plank",
+        "value": "inset 0 1px 0 rgb(255 255 255 / 0.06), 0 18px 40px -18px rgb(0 0 0 / 0.75)",
+        "purpose": "Lackiertes Brett."
+      },
+      {
+        "name": "booth-button",
+        "value": "inset 0 0 0 2px rgb(232 176 58 / 0.85), 0 10px 22px -8px rgb(143 20 36 / 0.75), 0 3px 6px rgb(0 0 0 / 0.35)",
+        "purpose": "Hauptknopf mit Messingrand."
+      },
+      {
+        "name": "booth-button-pressed",
+        "value": "inset 0 0 0 2px rgb(232 176 58 / 0.85), 0 4px 10px -6px rgb(143 20 36 / 0.7), 0 1px 3px rgb(0 0 0 / 0.35)",
+        "purpose": "Hauptknopf gedrückt."
+      },
+      {
+        "name": "quiet-button",
+        "value": "inset 0 0 0 1px rgb(244 234 214 / 0.08), 0 6px 14px -6px rgb(0 0 0 / 0.6)",
+        "purpose": "Stiller Knopf."
+      },
+      {
+        "name": "recessed",
+        "value": "inset 0 2px 6px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(244 234 214 / 0.05)",
+        "purpose": "Eingelassene Zukunftsfelder."
+      },
+      {
+        "name": "paper",
+        "value": "0 3px 7px rgb(0 0 0 / 0.4)",
+        "purpose": "Lose und Fotos auf der Tafel."
+      },
+      {
+        "name": "bulb-glow",
+        "value": "0 0 6px 1px rgb(255 210 122 / 0.75), 0 2px 3px rgb(0 0 0 / 0.5)",
+        "purpose": "Glühbirne."
+      },
+      {
+        "name": "today",
+        "value": "0 0 0 2px var(--bulb), 0 4px 14px rgb(255 190 110 / 0.35)",
+        "purpose": "Heutiges Feld, pulsiert."
+      },
+      {
+        "name": "sign-text",
+        "value": "0 1px 0 #8f1424, 0 2px 0 #8f1424, 0 3px 0 #5c0d18, 0 6px 14px rgb(0 0 0 / 0.55)",
+        "purpose": "Extrusion der Schildschrift (text-shadow), nur Rye auf Schildern."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-booth",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Standard-Easing für Knöpfe, Einblendungen, Losausgabe, Radgröße."
+      },
+      {
+        "name": "press",
+        "value": "160ms",
+        "purpose": "Knopf-Hover und -Druck."
+      },
+      {
+        "name": "enter",
+        "value": "450-500ms, y 16px",
+        "purpose": "Bühnenzustände und Tafelfelder (gestaffelt 18ms je Tag)."
+      },
+      {
+        "name": "ticket-out",
+        "value": "900ms",
+        "purpose": "Los fährt aus dem Schlitz."
+      },
+      {
+        "name": "bulb-chase",
+        "value": "1.2s ease-in-out infinite",
+        "purpose": "Birnenreihen, gegenphasig."
+      },
+      {
+        "name": "rim-chase",
+        "value": "2.4s ruhend / 0.36s Drehung / 1.4s Ergebnis",
+        "purpose": "Lauflicht am Glücksrad."
+      },
+      {
+        "name": "today-glow",
+        "value": "2.4s ease-in-out infinite",
+        "purpose": "Puls des heutigen Feldes."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none",
+        "purpose": "Alle Dauerschleifen stoppen."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "base",
+        "value": "390px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Buden-Knopf",
+      "kind": "button",
+      "refersTo": "button-booth",
+      "description": "Hauptaktion: lackiertes Rot mit Messingrand (Auslosen, Anmelden, Hochladen).",
+      "html": "<button class=\"ds-booth-btn\">Jetzt auslosen</button>",
+      "css": ".ds-booth-btn{height:56px;padding:0 32px;border:0;border-radius:16px;font-family:var(--nf-body),Figtree,sans-serif;font-size:18px;font-weight:800;letter-spacing:.01em;color:var(--cream,#f4ead6);background:var(--awning-red,#c41e32);box-shadow:inset 0 0 0 2px rgb(232 176 58/.85),0 10px 22px -8px rgb(143 20 36/.75),0 3px 6px rgb(0 0 0/.35);transition:transform 160ms cubic-bezier(0.16,1,0.3,1),box-shadow 160ms cubic-bezier(0.16,1,0.3,1),filter 160ms;cursor:pointer}.ds-booth-btn:hover{filter:brightness(1.07)}.ds-booth-btn:focus-visible{outline:2px solid var(--bulb,#ffd27a);outline-offset:3px}.ds-booth-btn:active{transform:translateY(2px);box-shadow:inset 0 0 0 2px rgb(232 176 58/.85),0 4px 10px -6px rgb(143 20 36/.7),0 1px 3px rgb(0 0 0/.35)}"
+    },
+    {
+      "name": "Stiller Knopf",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Nebenaktion in Brettkante (Galerie, Neu wählen, Weiter zur Tafel).",
+      "html": "<button class=\"ds-quiet-btn\">Weiter zur Tafel</button>",
+      "css": ".ds-quiet-btn{height:56px;padding:0 28px;border:0;border-radius:14px;font-family:var(--nf-body),Figtree,sans-serif;font-size:16px;font-weight:700;color:var(--cream,#f4ead6);background:var(--plank-edge,#4a2a22);box-shadow:inset 0 0 0 1px rgb(244 234 214/.08),0 6px 14px -6px rgb(0 0 0/.6);transition:transform 160ms cubic-bezier(0.16,1,0.3,1),filter 160ms;cursor:pointer}.ds-quiet-btn:hover{filter:brightness(1.12)}.ds-quiet-btn:focus-visible{outline:2px solid var(--bulb,#ffd27a);outline-offset:3px}.ds-quiet-btn:active{transform:translateY(2px)}"
+    },
+    {
+      "name": "Brett mit montiertem Schild",
+      "kind": "card",
+      "refersTo": "plank-card",
+      "description": "Abschnittscontainer: lackiertes Holz, rotes Schild mit Messingschrauben ragt über die Kante.",
+      "html": "<div class=\"ds-plank\"><div class=\"ds-sign\"><i></i><span>Gewinnertafel</span><i></i></div><p>10 Fotos an der Tafel</p></div>",
+      "css": ".ds-plank{margin-top:36px;padding:20px;border-radius:16px;border:1px solid #4a2a22;color:#f4ead6;font-family:var(--nf-body),Figtree,sans-serif;background:linear-gradient(180deg,rgb(255 255 255/.05),transparent 40%),repeating-linear-gradient(178deg,transparent 0 7px,rgb(0 0 0/.07) 7px 8px,transparent 8px 19px),#321c17;box-shadow:inset 0 1px 0 rgb(255 255 255/.06),0 18px 40px -18px rgb(0 0 0/.75)}.ds-plank p{margin:8px 0 0;text-align:center;font-family:var(--nf-ticket),'Big Shoulders','Arial Narrow',sans-serif;font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#c9b39c}.ds-sign{display:flex;align-items:center;gap:10px;width:max-content;margin:-44px auto 0;padding:8px 10px 10px;border-radius:10px;background:#c41e32;box-shadow:inset 0 0 0 2px rgb(232 176 58/.9),0 8px 16px -6px rgb(0 0 0/.7)}.ds-sign i{width:8px;height:8px;border-radius:999px;background:#e8b03a;box-shadow:inset 0 -1px 1px rgb(0 0 0/.4)}.ds-sign span{font-family:var(--nf-sign),Rye,Georgia,serif;font-size:1.4rem;line-height:1;color:#f4ead6;text-shadow:0 1px 0 #8f1424,0 2px 0 #8f1424,0 3px 0 #5c0d18,0 6px 14px rgb(0 0 0/.55)}"
+    },
+    {
+      "name": "Los im Lostopf",
+      "kind": "chip",
+      "refersTo": "ticket",
+      "description": "Person im Lostopf: Pastellpapier mit Stanzkerben; gestanzt und entsättigt, wenn im Durchgang schon dran.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-ticket\" style=\"background-color:#f4a7b5\">Claudia</span><span class=\"ds-ticket ds-ticket-used\" style=\"background-color:#9fd9c3\">Moritz<b></b></span></div>",
+      "css": ".ds-row{display:flex;gap:8px;padding:16px;background:#321c17}.ds-ticket{--n:7px;position:relative;display:inline-flex;align-items:center;height:40px;padding:0 24px 0 20px;font-family:var(--nf-body),Figtree,sans-serif;font-size:15px;font-weight:600;color:#2a1712;background-image:radial-gradient(rgb(42 23 18/.06) 1px,transparent 1.2px),linear-gradient(180deg,rgb(255 255 255/.25),transparent);background-size:5px 5px,100% 100%;-webkit-mask:radial-gradient(circle at 0 50%,transparent var(--n),#000 calc(var(--n) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent var(--n),#000 calc(var(--n) + .5px)) right/51% 100% no-repeat;mask:radial-gradient(circle at 0 50%,transparent var(--n),#000 calc(var(--n) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent var(--n),#000 calc(var(--n) + .5px)) right/51% 100% no-repeat}.ds-ticket-used{padding-right:40px;filter:saturate(.2) brightness(.9)}.ds-ticket-used b{position:absolute;right:18px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:999px;background:#321c17;box-shadow:inset 0 1.5px 2px rgb(0 0 0/.75)}"
+    },
+    {
+      "name": "Gewinnerlos",
+      "kind": "custom",
+      "refersTo": "ticket",
+      "description": "Ergebnis der Ziehung: Losnummer, Perforation, Name in Plakatgrotesk.",
+      "html": "<div class=\"ds-win\" style=\"background-color:#a9c7f1\"><div class=\"ds-win-no\"><small>Los</small><strong>14</strong></div><div class=\"ds-perf\"></div><div class=\"ds-win-body\"><p>Ella</p><span>zieht Los 14 und darf das Türchen öffnen.</span></div></div>",
+      "css": ".ds-win{--n:10px;display:flex;max-width:340px;color:#2a1712;background-image:radial-gradient(rgb(42 23 18/.06) 1px,transparent 1.2px);background-size:5px 5px;-webkit-mask:radial-gradient(circle at 0 50%,transparent var(--n),#000 calc(var(--n) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent var(--n),#000 calc(var(--n) + .5px)) right/51% 100% no-repeat;mask:radial-gradient(circle at 0 50%,transparent var(--n),#000 calc(var(--n) + .5px)) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent var(--n),#000 calc(var(--n) + .5px)) right/51% 100% no-repeat}.ds-win-no{width:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0;font-family:var(--nf-ticket),'Big Shoulders','Arial Narrow',sans-serif}.ds-win-no small{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.7}.ds-win-no strong{font-size:36px;line-height:1;font-weight:800}.ds-perf{width:1px;margin:12px 0;background-image:radial-gradient(circle,rgb(42 23 18/.35) 1.4px,transparent 1.8px);background-size:1px 7px}.ds-win-body{flex:1;padding:16px 24px 16px 16px;font-family:var(--nf-body),Figtree,sans-serif;font-size:14px;font-weight:500}.ds-win-body p{margin:0;font-family:var(--nf-ticket),'Big Shoulders','Arial Narrow',sans-serif;font-size:2.4rem;line-height:1.05;font-weight:800;text-transform:uppercase}"
+    },
+    {
+      "name": "Feld auf Papier",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Eingabe auf der Eintrittskarte (Login).",
+      "html": "<div class=\"ds-paper\"><label for=\"ds-u\">Benutzername</label><input id=\"ds-u\" class=\"ds-field\" placeholder=\"Dein Name\"></div>",
+      "css": ".ds-paper{padding:24px;background:#f4ead6;font-family:var(--nf-body),Figtree,sans-serif;color:#2a1712}.ds-paper label{display:block;margin-bottom:6px;font-size:14px;font-weight:600}.ds-field{height:48px;width:100%;padding:0 16px;border-radius:14px;border:2px solid rgb(42 23 18/.15);background:rgb(255 255 255/.55);font:500 16px var(--nf-body),Figtree,sans-serif;color:#2a1712;caret-color:#ffd27a;outline:none;transition:border-color 150ms,background-color 150ms}.ds-field::placeholder{color:rgb(42 23 18/.45)}.ds-field:focus,.ds-field:focus-visible{border-color:rgb(42 23 18/.6);background:rgb(255 255 255/.8)}"
+    },
+    {
+      "name": "Tafelfelder",
+      "kind": "custom",
+      "refersTo": "day-tile-today",
+      "description": "Gewinnertafel: gezogen in Losfarbe, heute beleuchtet, Zukunft eingelassen.",
+      "html": "<div class=\"ds-grid\"><button class=\"ds-tile ds-drawn\" style=\"background-color:#f5d26a\"><span>13</span><em>Christian</em></button><button class=\"ds-tile ds-today\"><span>14</span></button><button class=\"ds-tile ds-future\" disabled><span>15</span></button></div>",
+      "css": ".ds-grid{display:grid;grid-template-columns:repeat(3,72px);gap:6px;padding:16px;background:#321c17}.ds-tile{position:relative;aspect-ratio:1;border:0;border-radius:10px;text-align:left;cursor:pointer;transition:transform 200ms ease-out}.ds-tile span{position:absolute;top:4px;left:6px;font:800 1.55rem/1 var(--nf-ticket),'Big Shoulders','Arial Narrow',sans-serif}.ds-tile em{position:absolute;left:4px;bottom:4px;font:normal 700 10px var(--nf-body),Figtree,sans-serif;color:rgb(42 23 18/.8)}.ds-drawn{color:#2a1712;box-shadow:0 3px 7px rgb(0 0 0/.4)}.ds-drawn:hover{transform:translateY(-2px)}.ds-tile:focus-visible{outline:2px solid #ffd27a;outline-offset:3px}.ds-today{background:#c41e32;color:#f4ead6;box-shadow:0 0 0 2px #ffd27a,0 4px 14px rgb(255 190 110/.35);animation:ds-glow 2.4s ease-in-out infinite}.ds-future{background:#1a0f0d;color:rgb(244 234 214/.5);cursor:default;box-shadow:inset 0 2px 6px rgb(0 0 0/.6),inset 0 0 0 1px rgb(244 234 214/.05)}@keyframes ds-glow{50%{box-shadow:0 0 0 2px #fff4d6,0 6px 22px rgb(255 190 110/.55)}}@media (prefers-reduced-motion:reduce){.ds-today{animation:none}}"
+    },
+    {
+      "name": "Markise mit Birnenreihe",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Oberer Abschluss jeder Vollbildfläche, darunter laufende Glühbirnen.",
+      "html": "<div class=\"ds-wrap\"><div class=\"ds-awning\"></div><div class=\"ds-bulbs\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>",
+      "css": ".ds-wrap{background:#1a0f0d;padding-bottom:16px}.ds-awning{--s:44px;height:56px;background:repeating-linear-gradient(90deg,#c41e32 0 var(--s),#f4ead6 var(--s) calc(var(--s)*2));-webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 14px) no-repeat,radial-gradient(circle at 50% 0,#000 13px,transparent 14px) bottom left/var(--s) 14px repeat-x;mask:linear-gradient(#000 0 0) top/100% calc(100% - 14px) no-repeat,radial-gradient(circle at 50% 0,#000 13px,transparent 14px) bottom left/var(--s) 14px repeat-x}.ds-bulbs{display:flex;justify-content:space-between;margin:12px 24px 0}.ds-bulbs i{width:9px;height:9px;border-radius:999px;background:radial-gradient(circle at 35% 35%,#fff4d6,#ffd27a 55%,#d98f2a);box-shadow:0 0 6px 1px rgb(255 210 122/.75),0 2px 3px rgb(0 0 0/.5);animation:ds-chase 1.2s ease-in-out infinite}.ds-bulbs i:nth-child(2n){animation-delay:-.6s}@keyframes ds-chase{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.ds-bulbs i{animation:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Die Losbude am Weihnachtsmarkt",
+    "overview": "Die App ist eine beleuchtete Losbude bei Nacht. Eine rot-creme gestreifte Markise mit Bogenkante schließt jede Vollbildfläche oben ab, darunter hängen lackierte Holzschilder mit Glühbirnenrand. Inhalte liegen auf diesen Brettern, nicht auf Karten. Lose aus Pastellpapier tragen die Namen, die 25 Tage sind eine Gewinnertafel, das Glücksrad mit Lauflicht ist das Hauptobjekt.\n\nLicht kommt warm von oben (Bernstein-Schein über dem Nachtgrund), alles Helle ist Glühbirne, Messing oder Papier. Der Schneefall im Hintergrund ist Markenbindung und bleibt. Dichte: handyhoch, ein Blick erklärt den Tag; große Ziffern, wenige Wörter.\n\nVerworfen: das Karten-Dashboard auf Creme mit Tannengrün und Emoji-Deko, Neonfarben.",
+    "keyCharacteristics": [
+      "Nachtgrund in Rotbraun-Schwarz, nie reines Schwarz oder Grau.",
+      "Markise, Brett, Glühbirne, Los, Messing als einzige Materialien.",
+      "Drei Schriften mit festen Rollen: Schaustellerschrift, Plakatgrotesk, ruhige Grotesk.",
+      "Pro Person eine Papierfarbe, durchgängig auf Los, Marke, Tafel und Statistik.",
+      "Ein einziges beleuchtetes Feld: heute."
+    ],
+    "rules": [
+      {
+        "name": "The Warmlicht-Regel",
+        "body": "Alles Leuchtende ist Bernstein oder Creme. Keine Neonfarben, kein kaltes Weiß, kein Blau als Licht.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ein-Licht-Regel",
+        "body": "Auf der Gewinnertafel leuchtet nur das heutige Feld (Rot mit Birnenring und pulsierendem Schein). Andere Felder bleiben unbeleuchtet.",
+        "section": "colors"
+      },
+      {
+        "name": "The Papier-gleich-Person-Regel",
+        "body": "Losfarben bezeichnen ausschließlich Personen. Sie tragen keine Status- oder Dekorbedeutung.",
+        "section": "colors"
+      },
+      {
+        "name": "The Schild-Regel",
+        "body": "Rye nur auf Schildern und mit Extrusionsschatten (sign-text). Nie für Fließtext, Knöpfe oder Formularbeschriftung.",
+        "section": "typography"
+      },
+      {
+        "name": "The Aufdruck-Regel",
+        "body": "Versal-Labels mit Sperrung tragen immer Daten oder sind Losaufdruck. Kein Label ohne Information über einer Überschrift.",
+        "section": "typography"
+      },
+      {
+        "name": "The Schwerkraft-Regel",
+        "body": "Schatten fallen nach unten und sind weich. Harte versetzte Schlagschatten gibt es nur als Schriftextrusion auf Schildern.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** jede Vollbildfläche mit der Markise (56px, Bogenkante) oben abschließen.",
+      "**Do** Inhalte auf Bretter setzen, Abschnittstitel als montiertes Schild in Rye.",
+      "**Do** Personen immer in ihrer Losfarbe zeigen, mit Tinte als Text.",
+      "**Do** Zahlen in Big Shoulders mit Tabellenziffern setzen.",
+      "**Do** Bewegung mit cubic-bezier(0.16, 1, 0.3, 1) und bei reduzierter Bewegung alle Dauerschleifen (Lauflicht, Heute-Puls) anhalten."
+    ],
+    "donts": [
+      "**Don't** Neonfarben, kaltes Weiß oder Grau als Grund verwenden.",
+      "**Don't** Emoji als Deko oder Ikone; Sterne und Bäume werden als SVG gezeichnet.",
+      "**Don't** runde Avatare; Personen sind Papiermarken mit Initiale.",
+      "**Don't** mehr als ein Tafelfeld beleuchten.",
+      "**Don't** Rye außerhalb von Schildern setzen."
+    ]
+  }
+}

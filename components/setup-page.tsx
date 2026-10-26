@@ -4,13 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Gift, Plus, Trash2, Crown, Users } from "lucide-react"
+import { Plus, Trash2, Crown, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Snowfall from "@/components/snowfall"
+import { Awning, TreeMark } from "@/components/booth"
 
 interface FamilyMember {
   name: string
@@ -116,8 +117,10 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8] flex items-center justify-center p-4">
+    <div className="relative flex min-h-dvh flex-col overflow-x-hidden">
       <Snowfall />
+      <Awning className="relative z-10" />
+      <div className="relative z-10 flex flex-1 items-start justify-center px-4 pt-6 pb-12 md:items-center">
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -125,17 +128,11 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
         transition={{ duration: 0.6 }}
         className="w-full max-w-2xl"
       >
-        <Card className="shadow-2xl border-2 border-[#0f3d2e]/10">
+        <Card className="plank gap-4 rounded-2xl border-plank-edge py-6">
           <CardHeader className="text-center space-y-4">
-            <motion.div
-              className="mx-auto w-16 h-16 bg-gradient-to-br from-[#0f3d2e] to-[#2d5f4f] rounded-full flex items-center justify-center"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Gift className="w-8 h-8 text-[#f5e6c8]" />
-            </motion.div>
-            <CardTitle className="text-3xl font-bold text-[#0f3d2e]">Familien-Adventskalender einrichten</CardTitle>
-            <CardDescription className="text-base text-[#0f3d2e]/70">
+            <TreeMark className="mx-auto h-12 w-12 text-[#2f6b4f]" />
+            <CardTitle className="sign-text text-[1.7rem] leading-tight md:text-3xl">Familien-Adventskalender einrichten</CardTitle>
+            <CardDescription className="text-base text-cream-dim">
               Richte deinen Adventskalender ein, indem du deine Familienmitglieder anlegst
             </CardDescription>
           </CardHeader>
@@ -144,12 +141,12 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Family Size Selection */}
               <div className="space-y-2">
-                <Label htmlFor="familySize" className="text-[#0f3d2e] flex items-center gap-2">
+                <Label htmlFor="familySize" className="text-cream flex items-center gap-2">
                   <Users className="w-4 h-4" />
                   Anzahl der Familienmitglieder
                 </Label>
                 <Select value={familySize.toString()} onValueChange={(val) => setFamilySize(Number(val))}>
-                  <SelectTrigger className="border-[#0f3d2e]/20">
+                  <SelectTrigger className="border-input">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,7 +162,7 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
               {/* Members List */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[#0f3d2e]">
+                  <Label className="text-cream">
                     Familienmitglieder ({members.length}/{familySize})
                   </Label>
                   {members.length < familySize && (
@@ -174,7 +171,7 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
                       onClick={handleAddMember}
                       variant="outline"
                       size="sm"
-                      className="border-[#0f3d2e]/20 bg-transparent"
+                      className="border-input bg-transparent"
                     >
                       <Plus className="w-4 h-4 mr-1" />
                       Hinzufügen
@@ -184,14 +181,14 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
 
                 <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                   {members.map((member, index) => (
-                    <Card key={index} className="p-4 bg-[#f5e6c8]/30">
+                    <Card key={index} className="gap-0 rounded-xl border-plank-edge bg-night/50 p-4">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
                           <Input
                             placeholder="Name"
                             value={member.name}
                             onChange={(e) => handleMemberChange(index, "name", e.target.value)}
-                            className="flex-1 border-[#0f3d2e]/20"
+                            className="flex-1 border-input"
                             required
                           />
                           <Button
@@ -199,7 +196,7 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
                             onClick={() => handleSetAdmin(index)}
                             variant={member.isAdmin ? "default" : "outline"}
                             size="icon"
-                            className={member.isAdmin ? "bg-[#d4a574]" : ""}
+                            className={member.isAdmin ? "bg-brass text-ink hover:bg-brass/90" : "bg-transparent"}
                             title="Als Admin festlegen"
                           >
                             <Crown className="w-4 h-4" />
@@ -210,7 +207,7 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
                               onClick={() => handleRemoveMember(index)}
                               variant="outline"
                               size="icon"
-                              className="border-[#b52b3b]/20 text-[#b52b3b]"
+                              className="bg-transparent text-destructive"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -221,11 +218,11 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
                           placeholder="Passwort"
                           value={member.password}
                           onChange={(e) => handleMemberChange(index, "password", e.target.value)}
-                          className="border-[#0f3d2e]/20"
+                          className="border-input"
                           required
                         />
                         {member.isAdmin && (
-                          <p className="text-xs text-[#d4a574] flex items-center gap-1">
+                          <p className="flex items-center gap-1 text-xs text-brass">
                             <Crown className="w-3 h-3" />
                             Admin - Kann Bilder nachträglich hochladen
                           </p>
@@ -240,24 +237,21 @@ export default function SetupPage({ onSetupComplete }: SetupPageProps) {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-[#b52b3b] font-medium"
+                  role="alert"
+                  className="text-sm font-medium text-destructive"
                 >
                   {error}
                 </motion.p>
               )}
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-[#0f3d2e] to-[#2d5f4f] hover:from-[#2d5f4f] hover:to-[#0f3d2e] text-white"
-                size="lg"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Wird eingerichtet..." : "Einrichtung abschließen"}
-              </Button>
+              <button type="submit" className="booth-button h-14 w-full text-lg" disabled={isSubmitting}>
+                {isSubmitting ? "Wird eingerichtet …" : "Einrichtung abschließen"}
+              </button>
             </form>
           </CardContent>
         </Card>
       </motion.div>
+      </div>
     </div>
   )
 }

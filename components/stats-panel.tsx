@@ -1,8 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { TrendingUp, Users } from "lucide-react"
+import { MountedSign, NameStamp } from "@/components/booth"
 import type { Participant } from "@/lib/types"
 
 interface StatsPanelProps {
@@ -12,89 +11,62 @@ interface StatsPanelProps {
 }
 
 export default function StatsPanel({ participants, winnersByDay, currentCycleWinners }: StatsPanelProps) {
-  // Count wins per participant
+  // Gewinne pro Person zählen
   const winCounts = participants.map((participant) => {
     const wins = Object.values(winnersByDay).filter((id) => id === participant.id).length
     return { participant, wins }
   })
 
-  // Sort by wins
   winCounts.sort((a, b) => b.wins - a.wins)
 
-  // Get eligible participants for current cycle
+  // Ein voller Dezember hat 25 Ziehungen, gleichmäßig verteilt
+  const maxWins = Math.max(5, Math.ceil(25 / Math.max(participants.length, 1)))
+
   const eligibleParticipants = participants.filter((p) => !currentCycleWinners.includes(p.id))
 
   return (
-    <Card className="p-6 bg-white/90 backdrop-blur-sm shadow-xl border-2 border-[#0f3d2e]/10">
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-[#0f3d2e]" />
-          <h2 className="text-xl font-bold text-[#0f3d2e]">Statistik</h2>
-        </div>
+    <div className="plank rounded-2xl p-5 md:p-6">
+      <MountedSign>
+        <h2 className="sign-text text-[1.4rem] leading-none whitespace-nowrap md:text-[1.7rem]">Gewinnliste</h2>
+      </MountedSign>
 
-        {/* Win Counts */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-[#0f3d2e]/70">Anzahl Gewinne:</h3>
-          {winCounts.map(({ participant, wins }, index) => (
-            <motion.div
-              key={participant.id}
-              className="flex items-center gap-3"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                style={{ backgroundColor: participant.color }}
-              >
-                {participant.name.charAt(0)}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-[#0f3d2e]">{participant.name}</span>
-                  <span className="text-sm font-bold text-[#0f3d2e]">{wins}×</span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: participant.color }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(wins / 5) * 100}%` }}
-                    transition={{ duration: 1, delay: index * 0.1 + 0.2 }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+      <ul className="space-y-3.5">
+        {winCounts.map(({ participant, wins }, index) => (
+          <li key={participant.id} className="flex items-center gap-3">
+            <NameStamp name={participant.name} color={participant.color} size="sm" />
+            <span className="w-20 shrink-0 truncate text-[15px] font-semibold text-cream">{participant.name}</span>
+            {/* Ein Losabriss pro Gewinn */}
+            <span className="flex min-w-0 flex-1 gap-1" aria-hidden>
+              {Array.from({ length: maxWins }, (_, i) => (
+                <motion.span
+                  key={i}
+                  className="h-4 flex-1 rounded-[3px]"
+                  style={{ backgroundColor: i < wins ? participant.color : "rgb(244 234 214 / 0.08)" }}
+                  initial={{ scaleY: 0.3, opacity: 0 }}
+                  animate={{ scaleY: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 + index * 0.06 + i * 0.03, duration: 0.35 }}
+                />
+              ))}
+            </span>
+            <span className="ticket-num w-8 text-right text-lg font-bold text-cream tabular-nums">
+              {wins}
+              <span className="sr-only"> Gewinne</span>
+              <span aria-hidden>×</span>
+            </span>
+          </li>
+        ))}
+      </ul>
 
-        {/* Current Cycle Status */}
-        <div className="pt-4 border-t border-[#0f3d2e]/10">
-          <div className="flex items-center gap-2 mb-3">
-            <Users className="w-4 h-4 text-[#0f3d2e]" />
-            <h3 className="text-sm font-medium text-[#0f3d2e]/70">Aktueller Zyklus:</h3>
-          </div>
-          {eligibleParticipants.length > 0 ? (
-            <div>
-              <p className="text-sm text-[#0f3d2e] mb-2">Noch nicht dran in diesem Zyklus:</p>
-              <div className="flex flex-wrap gap-2">
-                {eligibleParticipants.map((participant) => (
-                  <motion.div
-                    key={participant.id}
-                    className="px-3 py-1 rounded-full text-sm font-medium text-white"
-                    style={{ backgroundColor: participant.color }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {participant.name}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-[#0f3d2e]">Alle haben in diesem Zyklus gewonnen! 🎉</p>
-          )}
-        </div>
+      <div className="mt-6 border-t border-dashed border-cream/15 pt-4">
+        <h3 className="text-sm font-semibold text-cream">Dieser Durchgang</h3>
+        {eligibleParticipants.length > 0 ? (
+          <p className="mt-1 text-sm leading-relaxed text-cream-dim">
+            Noch nicht dran: <span className="font-semibold text-cream">{eligibleParticipants.map((p) => p.name).join(", ")}</span>
+          </p>
+        ) : (
+          <p className="mt-1 text-sm text-cream-dim">Alle haben in diesem Durchgang gewonnen. Ab morgen geht es von vorn los.</p>
+        )}
       </div>
-    </Card>
+    </div>
   )
 }

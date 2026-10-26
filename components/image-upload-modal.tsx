@@ -3,8 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Camera, Upload, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Camera, ImagePlus, RotateCcw, Upload } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface ImageUploadModalProps {
@@ -22,12 +21,15 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
+  const [fileError, setFileError] = useState("")
+
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith("image/")) {
-      alert("Bitte wähle eine Bilddatei aus")
+      setFileError("Das ist keine Bilddatei. Bitte wähle ein Foto aus.")
       return
     }
 
+    setFileError("")
     setSelectedFile(file)
 
     const reader = new FileReader()
@@ -64,13 +66,18 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
     }
   }
 
+  const resetSelection = () => {
+    setPreview(null)
+    setSelectedFile(null)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-[#0f3d2e]">Glückwunsch, {winnerName}! 🎄</DialogTitle>
-          <DialogDescription className="text-base">
-            Du hast Türchen {day} gewonnen! Lade jetzt ein Bild von dir mit deinem Geschenk hoch.
+      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto border-plank-edge bg-night-2 p-5 sm:max-w-lg md:p-6">
+        <DialogHeader className="pr-6 text-left">
+          <DialogTitle className="sign-text text-[1.75rem] leading-tight">Glückwunsch, {winnerName}</DialogTitle>
+          <DialogDescription className="text-[15px] text-cream-dim">
+            Du hast Türchen {day} gewonnen. Lade jetzt ein Bild von dir mit deinem Geschenk hoch.
           </DialogDescription>
         </DialogHeader>
 
@@ -81,38 +88,39 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                className={`
-                  border-2 border-dashed rounded-lg p-8 text-center transition-all
-                  ${isDragging ? "border-[#b52b3b] bg-[#b52b3b]/5" : "border-[#0f3d2e]/30"}
-                `}
+                className={`hidden rounded-2xl border-2 border-dashed p-8 text-center transition-colors md:block ${
+                  isDragging ? "border-bulb bg-bulb/10" : "border-cream/20"
+                }`}
               >
-                <div className="flex flex-col items-center gap-4">
-                  <Upload className="w-12 h-12 text-[#0f3d2e]/50" />
-                  <div>
-                    <p className="text-lg font-medium text-[#0f3d2e]">Ziehe ein Bild hierher oder</p>
-                    <p className="text-sm text-[#0f3d2e]/70">wähle eine der Optionen unten</p>
-                  </div>
-                </div>
+                <ImagePlus className="mx-auto h-10 w-10 text-cream-dim" />
+                <p className="mt-3 font-semibold text-cream">Ziehe ein Bild hierher</p>
+                <p className="text-sm text-cream-dim">oder wähle eine der Optionen unten</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-[#0f3d2e] hover:bg-[#2d5f4f] text-white h-14"
-                  size="lg"
-                >
-                  <Upload className="w-5 h-5 mr-2" />
-                  Datei auswählen
-                </Button>
-                <Button
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="bg-[#b52b3b] hover:bg-[#8b3a3a] text-white h-14"
-                  size="lg"
+                  className="booth-button flex h-14 items-center justify-center gap-2.5 text-base"
                 >
-                  <Camera className="w-5 h-5 mr-2" />
+                  <Camera className="h-5 w-5" />
                   Foto aufnehmen
-                </Button>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="booth-button-quiet flex h-14 items-center justify-center gap-2.5 text-base"
+                >
+                  <Upload className="h-5 w-5" />
+                  Datei auswählen
+                </button>
               </div>
+
+              {fileError && (
+                <p role="alert" className="text-sm font-medium text-destructive">
+                  {fileError}
+                </p>
+              )}
 
               <input
                 ref={fileInputRef}
@@ -138,39 +146,26 @@ export default function ImageUploadModal({ open, onClose, onUpload, winnerName, 
             </>
           ) : (
             <div className="space-y-4">
-              <div className="relative rounded-lg overflow-hidden">
-                <img
-                  src={preview || "/placeholder.svg"}
-                  alt="Vorschau"
-                  className="w-full h-auto max-h-96 object-contain bg-gray-50"
-                />
-                <Button
-                  onClick={() => {
-                    setPreview(null)
-                    setSelectedFile(null)
-                  }}
-                  className="absolute top-2 right-2 bg-white/90 hover:bg-white text-[#b52b3b]"
-                  size="icon"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+              {/* Foto im Rahmen wie an der Gewinnertafel */}
+              <div className="rotate-[-1.2deg] rounded-md bg-cream p-2.5 pb-9 shadow-[0_16px_30px_-12px_rgb(0_0_0/0.7)]">
+                <img src={preview} alt="Vorschau deines Fotos" className="max-h-[52dvh] w-full rounded-sm bg-night object-contain" />
+                <p className="ticket-num mt-2 text-center text-sm font-bold tracking-[0.18em] text-ink/70 uppercase">
+                  Türchen {day} · {winnerName}
+                </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => {
-                    setPreview(null)
-                    setSelectedFile(null)
-                  }}
-                  variant="outline"
-                  className="border-[#0f3d2e] text-[#0f3d2e] hover:bg-[#0f3d2e]/5"
-                  size="lg"
+              <div className="grid grid-cols-[auto_1fr] gap-3">
+                <button
+                  type="button"
+                  onClick={resetSelection}
+                  className="booth-button-quiet flex h-14 items-center justify-center gap-2 px-4 text-base"
                 >
-                  Neues Bild wählen
-                </Button>
-                <Button onClick={handleUploadClick} className="bg-[#b52b3b] hover:bg-[#8b3a3a] text-white" size="lg">
+                  <RotateCcw className="h-4 w-4" />
+                  Anderes Bild
+                </button>
+                <button type="button" onClick={handleUploadClick} className="booth-button h-14 text-base">
                   Bild hochladen
-                </Button>
+                </button>
               </div>
             </div>
           )}

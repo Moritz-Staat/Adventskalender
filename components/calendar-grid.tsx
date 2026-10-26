@@ -1,9 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Lock, Star } from "lucide-react"
-import { Card } from "@/components/ui/card"
+import { Camera } from "lucide-react"
+import { MountedSign, StarIcon } from "@/components/booth"
 import type { Participant } from "@/lib/types"
+import { cn } from "@/lib/utils"
 
 interface CalendarGridProps {
   currentDay: number
@@ -27,6 +28,7 @@ export default function CalendarGrid({
   onAdminUploadClick,
 }: CalendarGridProps) {
   const days = Array.from({ length: 25 }, (_, i) => i + 1)
+  const photoCount = Object.keys(dayImages).length
 
   const getWinner = (day: number) => {
     const winnerId = winnersByDay[day]
@@ -39,7 +41,7 @@ export default function CalendarGrid({
     return "past"
   }
 
-  const handleDayClick = (day: number, status: string, winner: any, dayImage: string | undefined) => {
+  const handleDayClick = (day: number, status: string, winner: Participant | undefined, dayImage: string | undefined) => {
     const isFuture = status === "future"
 
     // Admin kann alle Tage mit Gewinner anklicken
@@ -62,95 +64,113 @@ export default function CalendarGrid({
   }
 
   return (
-    <Card className="p-4 md:p-6 bg-white/90 backdrop-blur-sm shadow-xl border-2 border-[#0f3d2e]/10">
-      <h2 className="text-2xl font-bold text-[#0f3d2e] mb-6">Adventskalender</h2>
+    <div className="plank rounded-2xl p-3 md:p-5">
+      <MountedSign className="mb-2">
+        <h2 className="sign-text text-[1.4rem] leading-none whitespace-nowrap md:text-[1.7rem]">Gewinnertafel</h2>
+      </MountedSign>
+      <p className="ticket-num mb-3 text-center text-sm font-semibold tracking-[0.14em] text-cream-dim uppercase">
+        {photoCount} {photoCount === 1 ? "Foto" : "Fotos"} an der Tafel
+      </p>
 
-      <div className="grid grid-cols-5 gap-2 md:gap-3">
+      <div className="grid grid-cols-5 gap-1.5 md:gap-2.5">
         {days.map((day) => {
           const status = getDayStatus(day)
           const winner = getWinner(day)
           const dayImage = dayImages[day]
           const isToday = status === "today"
-          const isPast = status === "past"
           const isFuture = status === "future"
           const isClickable = isAdmin ? !!winner : !isFuture && !!dayImage
-          const showAdminIndicator = isAdmin && winner
+          const label = [
+            `${day}. Dezember`,
+            isToday ? "heute" : null,
+            winner ? `gewonnen von ${winner.name}` : isFuture ? "noch zu" : "nicht ausgelost",
+            dayImage ? "mit Foto" : null,
+            isAdmin && winner ? "Foto hochladen" : null,
+          ]
+            .filter(Boolean)
+            .join(", ")
 
           return (
             <motion.button
               key={day}
-              onClick={() => {
-                handleDayClick(day, status, winner, dayImage)
-              }}
-              className={`
-                relative aspect-square rounded-lg flex flex-col items-center justify-center overflow-hidden
-                transition-all duration-300
-                ${isClickable ? "cursor-pointer hover:scale-105 hover:shadow-lg" : ""}
-                ${!isClickable ? "opacity-50 cursor-not-allowed" : ""}
-                ${isToday ? "ring-4 ring-[#b52b3b] ring-offset-2" : ""}
-                ${showAdminIndicator ? "ring-2 ring-[#b52b3b]/50 ring-offset-1" : ""}
-              `}
-              style={{
-                backgroundColor: isPast && winner ? winner.color : isFuture ? "#e5e5e5" : "#f5e6c8",
-              }}
-              whileHover={isClickable ? { y: -4 } : {}}
-              whileTap={isClickable ? { scale: 0.95 } : {}}
+              type="button"
+              aria-label={label}
+              onClick={() => handleDayClick(day, status, winner, dayImage)}
               disabled={!isClickable}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: day * 0.02 }}
+              className={cn(
+                "group relative aspect-square overflow-hidden rounded-[10px] text-left md:rounded-xl",
+                "transition-[transform,box-shadow] duration-200 ease-out",
+                isClickable && "cursor-pointer active:scale-[0.96] md:hover:-translate-y-0.5",
+                !isClickable && "cursor-default",
+                // Zukunft: unbeleuchtet, ins Brett eingelassen
+                isFuture && "bg-night shadow-[inset_0_2px_6px_rgb(0_0_0/0.6),inset_0_0_0_1px_rgb(244_234_214/0.05)]",
+                !isFuture && !winner && !dayImage && "bg-night-2 shadow-[inset_0_0_0_1px_rgb(244_234_214/0.08)]",
+                winner && !dayImage && "ticket-paper shadow-[0_3px_7px_rgb(0_0_0/0.4)]",
+                dayImage && "shadow-[0_3px_7px_rgb(0_0_0/0.4)]",
+                isToday && "today-tile",
+              )}
+              style={winner && !dayImage ? { backgroundColor: winner.color } : undefined}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + day * 0.018, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
               {dayImage && (
-                <div
-                  className="absolute inset-0 bg-cover bg-center cursor-zoom-in z-0"
-                  style={{
-                    backgroundImage: `url(${dayImage})`,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/20" />
-                </div>
-              )}
-
-              {isToday && (
-                <motion.div
-                  className="absolute -top-1 -right-1 z-20"
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                >
-                  <Star className="w-4 h-4 text-[#b52b3b] fill-[#b52b3b]" />
-                </motion.div>
+                <>
+                  <img
+                    src={dayImage}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute inset-0 bg-[linear-gradient(160deg,rgb(26_15_13/0.55),transparent_45%,rgb(26_15_13/0.5))]" />
+                </>
               )}
 
               <span
-                className={`relative z-10 text-xl md:text-2xl font-bold ${
-                  (isPast && winner) || dayImage ? "text-white drop-shadow-lg" : "text-[#0f3d2e]"
-                }`}
+                className={cn(
+                  "ticket-num absolute top-1 left-1.5 text-[1.55rem] leading-none font-extrabold md:top-1.5 md:left-2 md:text-[2rem]",
+                  isFuture && "text-cream/50",
+                  !isFuture && !winner && !dayImage && "text-cream-dim",
+                  winner && !dayImage && "text-ink",
+                  dayImage && "rounded-[6px] bg-night/75 px-1 pt-0.5 text-cream",
+                  isToday && !winner && "text-cream",
+                )}
               >
                 {day}
               </span>
 
-              {!dayImage && winner && (
-                <div className="absolute inset-0 flex items-center justify-center z-5 pointer-events-none">
-                  <span className="text-white text-xs md:text-sm font-bold drop-shadow-lg text-center px-1">
-                    {winner.name}
-                  </span>
-                </div>
+              {winner && !dayImage && (
+                <span className="absolute inset-x-1 bottom-1 truncate text-[10px] leading-tight font-bold text-ink/80 md:bottom-1.5 md:text-xs">
+                  {winner.name}
+                </span>
               )}
 
-              {!winner && isFuture && <Lock className="relative z-10 w-3 h-3 md:w-4 md:h-4 text-[#0f3d2e]/50 mt-1" />}
-
-              {isPast && winner && (
-                <div
-                  className="absolute bottom-1 right-1 z-10 w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/90 flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md pointer-events-none"
-                  style={{ color: winner.color }}
+              {dayImage && winner && (
+                <span
+                  className="ticket-num absolute right-1 bottom-1 flex h-5 w-5 items-center justify-center rounded-[5px] text-[11px] font-extrabold text-ink md:h-6 md:w-6 md:text-xs"
+                  style={{ backgroundColor: winner.color }}
                 >
                   {winner.name.charAt(0)}
-                </div>
+                </span>
+              )}
+
+              {isToday && (
+                <StarIcon className="absolute right-1 bottom-1 h-4 w-4 text-bulb drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)] md:h-5 md:w-5" />
+              )}
+
+              {isAdmin && winner && !dayImage && (
+                <Camera className="absolute top-1.5 right-1.5 h-3 w-3 text-ink/50 md:h-3.5 md:w-3.5" />
               )}
             </motion.button>
           )
         })}
       </div>
-    </Card>
+
+      <p className="mt-4 px-1 text-xs leading-relaxed text-cream-dim md:text-sm">
+        {isAdmin
+          ? "Als Admin kannst du jedes ausgeloste Feld antippen und ein Foto hochladen."
+          : "Tippe auf ein Feld mit Foto, um es groß anzusehen."}
+      </p>
+    </div>
   )
 }
