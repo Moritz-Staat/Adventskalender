@@ -3,81 +3,51 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+  Losbude am Weihnachtsmarkt.
+  Budennacht als Grund, rot-creme Markise, warmweiße Glühbirnen,
+  Lose in Pastellpapier. Keine Neonfarben.
+*/
 :root {
-  /* Christmas-themed colors for the advent calendar */
-  --background: oklch(0.98 0.01 85);
-  --foreground: oklch(0.25 0.05 165);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.05 165);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.05 165);
-  --primary: oklch(0.25 0.05 165);
-  --primary-foreground: oklch(0.96 0.02 85);
-  --secondary: oklch(0.96 0.02 85);
-  --secondary-foreground: oklch(0.25 0.05 165);
-  --muted: oklch(0.96 0.02 85);
-  --muted-foreground: oklch(0.25 0.05 165);
-  --accent: oklch(0.48 0.18 20);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.48 0.18 20);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.25 0.05 165 / 0.1);
-  --input: oklch(0.25 0.05 165 / 0.2);
-  --ring: oklch(0.25 0.05 165);
-  --chart-1: oklch(0.25 0.05 165);
-  --chart-2: oklch(0.48 0.18 20);
-  --chart-3: oklch(0.65 0.08 75);
-  --chart-4: oklch(0.35 0.06 165);
-  --chart-5: oklch(0.4 0.12 25);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  --night: #1a0f0d;
+  --night-2: #241512;
+  --plank: #321c17;
+  --plank-edge: #4a2a22;
+  --awning-red: #c41e32;
+  --awning-red-deep: #8f1424;
+  --cream: #f4ead6;
+  --cream-dim: #c9b39c;
+  --bulb: #ffd27a;
+  --bulb-core: #fff4d6;
+  --brass: #e8b03a;
+  --ink: #2a1712;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --background: var(--night);
+  --foreground: var(--cream);
+  --card: var(--night-2);
+  --card-foreground: var(--cream);
+  --popover: var(--night-2);
+  --popover-foreground: var(--cream);
+  --primary: var(--awning-red);
+  --primary-foreground: var(--cream);
+  --secondary: var(--plank);
+  --secondary-foreground: var(--cream);
+  --muted: var(--plank);
+  --muted-foreground: var(--cream-dim);
+  --accent: var(--plank-edge);
+  --accent-foreground: var(--cream);
+  --destructive: #ff8a7a;
+  --destructive-foreground: var(--ink);
+  --border: rgb(244 234 214 / 0.14);
+  --input: rgb(244 234 214 / 0.22);
+  --ring: var(--bulb);
+  --radius: 0.625rem;
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: var(--nf-body), ui-sans-serif, system-ui, sans-serif;
+  --font-sign: var(--nf-sign), Georgia, serif;
+  --font-ticket: var(--nf-ticket), "Arial Narrow", sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -97,30 +67,273 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  --color-plank: var(--plank);
+  --color-plank-edge: var(--plank-edge);
+  --color-awning: var(--awning-red);
+  --color-awning-deep: var(--awning-red-deep);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-bulb: var(--bulb);
+  --color-brass: var(--brass);
+  --color-ink: var(--ink);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--plank-edge) var(--night);
+  }
   body {
     @apply bg-background text-foreground;
+    background-color: var(--night);
+    /* Licht der Bude von oben, Holzboden-Dunkel nach unten */
+    background-image: radial-gradient(120% 900px at 50% -10%, rgb(255 190 110 / 0.16), transparent 60%);
+    background-repeat: no-repeat;
+  }
+  ::selection {
+    background: var(--bulb);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--bulb);
+    outline-offset: 3px;
+  }
+  input {
+    caret-color: var(--bulb);
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--night);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--plank-edge);
+    border-radius: 999px;
+    border: 2px solid var(--night);
+  }
+}
+
+@layer components {
+  /* Rot-creme Markise, unten in Bögen ausgeschnitten */
+  .awning {
+    --stripe: 44px;
+    position: relative;
+    height: 56px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--awning-red) 0 var(--stripe),
+      var(--cream) var(--stripe) calc(var(--stripe) * 2)
+    );
+    box-shadow: inset 0 -10px 18px -10px rgb(0 0 0 / 0.35);
+    -webkit-mask:
+      linear-gradient(#000 0 0) top / 100% calc(100% - 14px) no-repeat,
+      radial-gradient(circle at 50% 0, #000 13px, transparent 14px) bottom left / var(--stripe) 14px repeat-x;
+    mask:
+      linear-gradient(#000 0 0) top / 100% calc(100% - 14px) no-repeat,
+      radial-gradient(circle at 50% 0, #000 13px, transparent 14px) bottom left / var(--stripe) 14px repeat-x;
+  }
+  .awning::after {
+    /* Faltenwurf */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgb(0 0 0 / 0.16) 0,
+      transparent 6px,
+      transparent calc(var(--stripe) - 6px),
+      rgb(0 0 0 / 0.1) var(--stripe)
+    );
+  }
+
+  /* Lackiertes Holzschild */
+  .plank {
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 40%),
+      repeating-linear-gradient(
+        178deg,
+        transparent 0 7px,
+        rgb(0 0 0 / 0.07) 7px 8px,
+        transparent 8px 19px
+      ),
+      var(--plank);
+    border: 1px solid var(--plank-edge);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 18px 40px -18px rgb(0 0 0 / 0.75);
+  }
+
+  /* Glühbirne */
+  .bulb {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 35%, var(--bulb-core), var(--bulb) 55%, #d98f2a);
+    box-shadow:
+      0 0 6px 1px rgb(255 210 122 / 0.75),
+      0 2px 3px rgb(0 0 0 / 0.5);
+  }
+  .bulb-off {
+    background: radial-gradient(circle at 35% 35%, #8a6a52, #4a3328 70%);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+  }
+
+  /* Los: Pastellpapier mit Stanzlöchern an den Enden */
+  .ticket {
+    --notch: 7px;
+    position: relative;
+    color: var(--ink);
+    -webkit-mask:
+      radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) left / 51% 100% no-repeat,
+      radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) left / 51% 100% no-repeat,
+      radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) right / 51% 100% no-repeat;
+  }
+  .ticket-paper {
+    background-image:
+      radial-gradient(rgb(42 23 18 / 0.06) 1px, transparent 1.2px),
+      linear-gradient(180deg, rgb(255 255 255 / 0.25), transparent);
+    background-size: 5px 5px, 100% 100%;
+  }
+  .perforation {
+    background-image: radial-gradient(circle, rgb(42 23 18 / 0.35) 1.4px, transparent 1.8px);
+    background-size: 1px 7px;
+    background-repeat: repeat-y;
+    width: 1px;
+  }
+
+  /* Lackierter roter Buden-Knopf mit Messingrand */
+  .booth-button {
+    border-radius: 16px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: var(--cream);
+    background: var(--awning-red);
+    box-shadow:
+      inset 0 0 0 2px rgb(232 176 58 / 0.85),
+      0 10px 22px -8px rgb(143 20 36 / 0.75),
+      0 3px 6px rgb(0 0 0 / 0.35);
+    transition:
+      transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1),
+      filter 160ms;
+  }
+  .booth-button:hover {
+    filter: brightness(1.07);
+  }
+  .booth-button:active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 0 0 2px rgb(232 176 58 / 0.85),
+      0 4px 10px -6px rgb(143 20 36 / 0.7),
+      0 1px 3px rgb(0 0 0 / 0.35);
+  }
+  .booth-button:disabled {
+    cursor: progress;
+    filter: saturate(0.7) brightness(0.9);
+  }
+  .booth-button-quiet {
+    border-radius: 14px;
+    font-weight: 700;
+    color: var(--cream);
+    background: var(--plank-edge);
+    box-shadow:
+      inset 0 0 0 1px rgb(244 234 214 / 0.08),
+      0 6px 14px -6px rgb(0 0 0 / 0.6);
+    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), filter 160ms;
+  }
+  .booth-button-quiet:hover {
+    filter: brightness(1.12);
+  }
+  .booth-button-quiet:active {
+    transform: translateY(2px);
+  }
+
+  .sign-text {
+    font-family: var(--nf-sign), Georgia, serif;
+    color: var(--cream);
+    text-shadow:
+      0 1px 0 var(--awning-red-deep),
+      0 2px 0 var(--awning-red-deep),
+      0 3px 0 #5c0d18,
+      0 6px 14px rgb(0 0 0 / 0.55);
+  }
+  .ticket-num {
+    font-family: var(--nf-ticket), "Arial Narrow", sans-serif;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+/* Das heutige Feld ist das einzige beleuchtete auf der Tafel */
+.today-tile {
+  background-color: var(--awning-red);
+  box-shadow:
+    0 0 0 2px var(--bulb),
+    0 4px 14px rgb(255 190 110 / 0.35);
+  animation: today-glow 2.4s ease-in-out infinite;
+}
+@keyframes today-glow {
+  50% {
+    box-shadow:
+      0 0 0 2px var(--bulb-core),
+      0 6px 22px rgb(255 190 110 / 0.55);
+  }
+}
+
+@keyframes bulb-chase {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.chase > * {
+  animation: bulb-chase 1.2s ease-in-out infinite;
+}
+.chase > *:nth-child(2n) {
+  animation-delay: -0.6s;
+}
+
+/* Lauflicht am Glücksrad */
+.rim-chase > g {
+  animation: bulb-chase 1.4s ease-in-out infinite;
+}
+.rim-chase > g:nth-child(2n) {
+  animation-delay: -0.7s;
+}
+.rim-fast > g {
+  animation-duration: 0.36s;
+}
+.rim-fast > g:nth-child(2n) {
+  animation-delay: -0.18s;
+}
+.rim-slow > g {
+  animation-duration: 2.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chase > *,
+  .rim-chase > g,
+  .today-tile {
+    animation: none;
   }
 }

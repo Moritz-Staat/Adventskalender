@@ -5,6 +5,7 @@ import LoginPage from "@/components/login-page"
 import SetupPage from "@/components/setup-page"
 import Dashboard from "@/components/dashboard"
 import WheelModal from "@/components/wheel-modal"
+import { Awning, BulbRow, TreeMark } from "@/components/booth"
 import type { Participant, DrawingState } from "@/lib/types"
 import { getCurrentDay } from "@/lib/utils"
 import {
@@ -107,19 +108,21 @@ export default function Home() {
       const currentDay = getCurrentDay()
       await markDrawAsViewed(currentUser.id, currentDay)
     }
+  }
+
+  const handleLoginAnimationDismiss = () => {
     setShowLoginAnimation(false)
     setPendingWinner(null)
   }
 
-  const handleNewDraw = async (winnerId: string) => {
+  // Erst in der Datenbank auslosen, dann dreht das Rad genau zu diesem Gewinner
+  const handlePerformDraw = async () => {
+    return performSupabaseDraw(getCurrentDay())
+  }
+
+  const handleDrawRevealed = async () => {
     if (!currentUser) return
-
-    const currentDay = getCurrentDay()
-
-    await performSupabaseDraw(currentDay)
-
-    await markDrawAsViewed(currentUser.id, currentDay)
-
+    await markDrawAsViewed(currentUser.id, getCurrentDay())
     await reloadDrawingState()
   }
 
@@ -139,10 +142,12 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5e6c8] via-white to-[#f5e6c8]">
-        <div className="text-center">
-          <div className="text-4xl mb-4">🎄</div>
-          <p className="text-xl text-[#0f3d2e] font-medium">Lädt...</p>
+      <div className="flex min-h-dvh flex-col">
+        <Awning />
+        <div className="flex flex-1 flex-col items-center justify-center gap-5 px-6 pb-24" role="status">
+          <TreeMark className="h-14 w-14 text-[#2f6b4f]" />
+          <BulbRow count={7} className="w-40" />
+          <p className="font-semibold text-cream-dim">Die Bude öffnet …</p>
         </div>
       </div>
     )
@@ -163,7 +168,8 @@ export default function Home() {
         drawingState={drawingState}
         onLogout={handleLogout}
         onUpdateState={reloadDrawingState}
-        onNewDraw={handleNewDraw}
+        onPerformDraw={handlePerformDraw}
+        onDrawRevealed={handleDrawRevealed}
         onImageUpload={handleImageUpload}
       />
 
@@ -172,6 +178,8 @@ export default function Home() {
           open={showLoginAnimation}
           participants={drawingState.participants}
           onComplete={handleLoginAnimationComplete}
+          onDismiss={handleLoginAnimationDismiss}
+          day={getCurrentDay()}
           soundEnabled={drawingState.settings?.soundEnabled ?? true}
           confettiEnabled={drawingState.settings?.confettiEnabled ?? true}
           preselectedWinnerId={pendingWinner}

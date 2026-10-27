@@ -16,12 +16,13 @@ export interface CycleState {
   updated_at: string
 }
 
+// Losfarben: jede Person hat ihr eigenes Pastell-Lospapier
 const PARTICIPANT_COLORS: Record<string, string> = {
-  moritz: "#2d5f4f",
-  claudia: "#b52b3b",
-  christian: "#d4a574",
-  ella: "#8b3a3a",
-  clara: "#0f3d2e",
+  moritz: "#9fd9c3",
+  claudia: "#f4a7b5",
+  christian: "#f5d26a",
+  ella: "#a9c7f1",
+  clara: "#cab4ee",
 }
 
 // Teilnehmer aus Datenbank holen
@@ -238,6 +239,6 @@ export async function checkSetupStatus(): Promise<boolean> {
 }
 
 function getColorByIndex(index: number): string {
-  const colors = ["#0f3d2e", "#b52b3b", "#d4a574", "#8b3a3a", "#2d5f4f", "#7a2d2d"]
+  const colors = ["#9fd9c3", "#f4a7b5", "#f5d26a", "#a9c7f1", "#cab4ee", "#f6b98a"]
   return colors[index % colors.length]
 }

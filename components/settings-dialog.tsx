@@ -15,20 +15,20 @@ interface SettingsDialogProps {
 export default function SettingsDialog({ open, onOpenChange, settings, onUpdateSettings }: SettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white">
+      <DialogContent className="border-plank-edge bg-night-2 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-[#0f3d2e]">Einstellungen</DialogTitle>
-          <DialogDescription className="text-[#0f3d2e]/70">
+          <DialogTitle className="sign-text text-2xl">Einstellungen</DialogTitle>
+          <DialogDescription className="text-cream-dim">
             Passe die App-Einstellungen nach deinen Wünschen an.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="sound" className="text-[#0f3d2e] font-medium">
+              <Label htmlFor="sound" className="text-cream font-semibold">
                 Soundeffekte
               </Label>
-              <p className="text-sm text-[#0f3d2e]/70">Spiele Sounds bei der Auslosung ab</p>
+              <p className="text-sm text-cream-dim">Rad-Ticken und Fanfare bei der Auslosung</p>
             </div>
             <Switch
               id="sound"
@@ -38,10 +38,10 @@ export default function SettingsDialog({ open, onOpenChange, settings, onUpdateS
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="confetti" className="text-[#0f3d2e] font-medium">
+              <Label htmlFor="confetti" className="text-cream font-semibold">
                 Konfetti
               </Label>
-              <p className="text-sm text-[#0f3d2e]/70">Zeige Konfetti bei der Gewinner-Anzeige</p>
+              <p className="text-sm text-cream-dim">Zeige Konfetti bei der Gewinner-Anzeige</p>
             </div>
             <Switch
               id="confetti"
