@@ -22,9 +22,9 @@ Kein Kalender, der Inhalte hinter Türchen versteckt, sondern ein faires Familie
 - Ersteinrichtung (Setup-Seite) legt 3–6 Familienmitglieder mit Passwort und einen Admin an.
 
 ## Capabilities and Constraints
-- Next.js 16 + React 19 + Tailwind 4 + framer-motion, Daten in Supabase (Tabellen + Storage), Deployment auf Vercel (Push auf `main` = Production).
-- Tage 1–25, Monat fest Dezember. Außerhalb Dezembers simuliert `getCurrentDay()` einen Tag zum Testen.
-- Teilnehmerfarben sind UI-only (Mapping in `lib/supabase-helpers.ts`), nicht in der DB.
+- Next.js 16 + React 19 + Tailwind 4 + framer-motion, Daten in SQLite, Fotos als Dateien, Docker-Container auf dem intelnuc (siehe DEPLOYMENT.md).
+- Tage 1–25, Monat fest Dezember. Der Server bestimmt den Tag; zum Testen setzt `ADVENT_TEST_DAY` ihn fest.
+- Teilnehmerfarben sind UI-only (Mapping in `lib/api.ts`), nicht in der DB.
 - Einstellungen Sound/Konfetti werden lokal gespeichert.
 - Alle Funktionen, Texte und Abläufe bleiben erhalten; der visuelle Auftritt ist frei.
 
@@ -33,7 +33,7 @@ Kein Kalender, der Inhalte hinter Türchen versteckt, sondern ein faires Familie
 - Schneefall im Hintergrund bleibt (vom Nutzer als bindend benannt).
 
 ## Evidence on Hand
-Echte Inhalte sind nur die Familiennamen und die im Dezember hochgeladenen Fotos (Supabase Storage). Keine Platzhalter-Fotos als echt ausgeben.
+Echte Inhalte sind nur die Familiennamen und die im Dezember hochgeladenen Fotos (Datenordner auf dem Server). Keine Platzhalter-Fotos als echt ausgeben.
 
 ## Product Principles
 - Der tägliche Moment zählt: Auslosung und Kalender sind gleichwertige Hauptdarsteller.

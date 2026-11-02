@@ -63,11 +63,9 @@ export default function Dashboard({
     }
   }
 
-  const handleAdminUploadClick = (day: number) => {
-    if (currentUser.isAdmin) {
-      setUploadDay(day)
-      setShowImageUpload(true)
-    }
+  const handleUploadClick = (day: number) => {
+    setUploadDay(day)
+    setShowImageUpload(true)
   }
 
   const handleImageUpload = async (file: File) => {
@@ -360,7 +358,8 @@ export default function Dashboard({
               onDayClick={setSelectedDay}
               onImageClick={handleImageView}
               isAdmin={currentUser.isAdmin}
-              onAdminUploadClick={handleAdminUploadClick}
+              currentUserId={currentUser.id}
+              onUploadClick={handleUploadClick}
             />
           </section>
 
