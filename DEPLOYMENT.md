@@ -1,145 +1,42 @@
-# Deployment-Anleitung
+# Betrieb auf dem intelnuc
 
-## Vorbereitung
+Live unter `adventskalender.staatsprojekte.uk`: Cloudflare-Tunnel → Nginx Proxy Manager → Container `adventskalender:3000`.
 
-Bevor du das Projekt deployst, stelle sicher, dass du:
+Alles liegt in `~/stacks/adventskalender` (Git-Klon von `main`). Datenbank und Fotos liegen in `data/` und sind nicht in Git.
 
-1. Alle SQL-Migrations-Scripts in deiner Supabase-Datenbank ausgeführt hast
-2. Die Environment Variables notiert hast
-3. Das Projekt lokal getestet hast
+## Aktualisieren
 
-## Deployment auf Vercel
-
-### Schritt 1: GitHub Repository
-
-```bash
-# Initialisiere Git (falls noch nicht geschehen)
-git init
-git add .
-git commit -m "Initial commit"
-
-# Erstelle ein neues Repository auf GitHub und pushe
-git remote add origin https://github.com/dein-username/adventskalender.git
-git branch -M main
-git push -u origin main
+```sh
+cd ~/stacks/adventskalender
+git pull --ff-only
+docker compose up -d --build
 ```
 
-### Schritt 2: Mit Vercel verbinden
+## Verwaltung
 
-1. Gehe zu [vercel.com](https://vercel.com)
-2. Klicke auf "New Project"
-3. Importiere dein GitHub Repository
-4. Wähle "Next.js" als Framework (wird automatisch erkannt)
+Der erste Name bei `setup` wird Admin. Passwörter werden nur einmal ausgegeben und gehören in Vaultwarden.
 
-### Schritt 3: Environment Variables hinzufügen
-
-Füge in den Vercel Project Settings folgende Environment Variables hinzu:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://dein-projekt.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=dein-anon-key
+```sh
+docker compose exec adventskalender node scripts/manage.mjs setup Moritz Claudia Christian Ella Clara
+docker compose exec adventskalender node scripts/manage.mjs password Ella    # neues Passwort, meldet Ella überall ab
+docker compose exec adventskalender node scripts/manage.mjs new-season       # vor jedem neuen Dezember
 ```
 
-### Schritt 4: Deployen
+`new-season` leert Ziehungen und Lostopf. Alte Fotos bleiben in `data/images/` liegen und werden nicht mehr angezeigt.
 
-Klicke auf "Deploy" - Vercel baut und deployed deine App automatisch.
+## Testen außerhalb des Dezembers
 
-Deine App ist dann verfügbar unter: `https://dein-projekt.vercel.app`
+Eine `docker-compose.override.yml` neben der Compose-Datei legt den Tag fest:
 
-## Deployment auf anderen Plattformen
-
-### Netlify
-
-1. Pushe zu GitHub
-2. Verbinde mit Netlify
-3. Build Command: `npm run build`
-4. Publish Directory: `.next`
-5. Füge Environment Variables hinzu
-
-### Railway.app
-
-1. Erstelle ein neues Projekt auf Railway
-2. Verbinde mit GitHub
-3. Füge Environment Variables hinzu
-4. Railway deployed automatisch
-
-### Eigener Server (VPS)
-
-```bash
-# Auf dem Server
-git clone https://github.com/dein-username/adventskalender.git
-cd adventskalender
-
-# Environment Variables erstellen
-nano .env.local
-# Füge NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY hinzu
-
-# Installieren und bauen
-npm install
-npm run build
-
-# Mit PM2 starten (Production)
-npm install -g pm2
-pm2 start npm --name "adventskalender" -- start
-
-# Nginx Reverse Proxy konfigurieren
-# ...
+```yaml
+services:
+  adventskalender:
+    environment:
+      ADVENT_TEST_DAY: "1"
 ```
 
-## Domain konfigurieren
-
-### Bei Vercel
-
-1. Gehe zu Project Settings → Domains
-2. Füge deine Domain hinzu
-3. Konfiguriere DNS-Einträge bei deinem Domain-Provider
-
-### DNS-Konfiguration
-
-Füge einen CNAME-Eintrag hinzu:
-
-```
-Type: CNAME
-Name: @ (oder subdomain)
-Value: cname.vercel-dns.com
-```
-
-## Post-Deployment
-
-### Initial-Setup durchführen
-
-1. Öffne deine deployed App
-2. Logge dich als `admin/admin` ein
-3. Richte deine Familie ein
-4. Fertig!
-
-### Monitoring
-
-- Prüfe die Vercel Logs auf Fehler
-- Prüfe Supabase Dashboard → Logs
-- Setze Alerts in Supabase für kritische Fehler
+Nach `docker compose up -d` gilt der Tag. Zum Aufräumen die Datei löschen, erneut `docker compose up -d` ausführen, `new-season` aufrufen und `data/images/` leeren.
 
 ## Backup
 
-### Datenbank Backup
-
-Supabase erstellt automatisch tägliche Backups. Du kannst auch manuelle Backups erstellen:
-
-```bash
-# Export via Supabase CLI
-supabase db dump > backup.sql
-```
-
-### Bilder Backup
-
-Die Admin-Funktion "Alle Bilder herunterladen" erstellt ein ZIP-Backup aller hochgeladenen Bilder.
-
-## Updates
-
-```bash
-# Lokale Änderungen pushen
-git add .
-git commit -m "Update"
-git push
-
-# Vercel deployed automatisch nach jedem Push
+`~/backup.sh` läuft sonntags um 02:00 und sichert einen konsistenten Snapshot der Datenbank sowie die Fotos auf Google Drive.

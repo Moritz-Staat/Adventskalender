@@ -1,0 +1,18 @@
+# Adventskalender auf intelnuc. Keine veröffentlichten Ports: der Nginx Proxy Manager
+# erreicht den Container über core_default unter seinem Namen.
+services:
+  adventskalender:
+    build: .
+    image: adventskalender:latest
+    container_name: adventskalender
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - ./data:/data
+    networks:
+      - core_default
+
+networks:
+  core_default:
+    external: true

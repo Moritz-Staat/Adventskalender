@@ -14,7 +14,8 @@ interface CalendarGridProps {
   onDayClick: (day: number) => void
   onImageClick?: (day: number) => void
   isAdmin?: boolean
-  onAdminUploadClick?: (day: number) => void
+  currentUserId: string
+  onUploadClick?: (day: number) => void
 }
 
 export default function CalendarGrid({
@@ -25,7 +26,8 @@ export default function CalendarGrid({
   onDayClick,
   onImageClick,
   isAdmin = false,
-  onAdminUploadClick,
+  currentUserId,
+  onUploadClick,
 }: CalendarGridProps) {
   const days = Array.from({ length: 25 }, (_, i) => i + 1)
   const photoCount = Object.keys(dayImages).length
@@ -41,12 +43,15 @@ export default function CalendarGrid({
     return "past"
   }
 
+  // Admin: jeder ausgeloste Tag. Alle anderen: das eigene Feld, solange das Foto noch fehlt.
+  const canUpload = (winner: Participant | undefined, dayImage: string | undefined) =>
+    !!winner && (isAdmin || (winner.id === currentUserId && !dayImage))
+
   const handleDayClick = (day: number, status: string, winner: Participant | undefined, dayImage: string | undefined) => {
     const isFuture = status === "future"
 
-    // Admin kann alle Tage mit Gewinner anklicken
-    if (isAdmin && winner && onAdminUploadClick) {
-      onAdminUploadClick(day)
+    if (canUpload(winner, dayImage) && onUploadClick) {
+      onUploadClick(day)
       return
     }
 
@@ -79,13 +84,14 @@ export default function CalendarGrid({
           const dayImage = dayImages[day]
           const isToday = status === "today"
           const isFuture = status === "future"
-          const isClickable = isAdmin ? !!winner : !isFuture && !!dayImage
+          const uploadable = canUpload(winner, dayImage)
+          const isClickable = uploadable || (!isFuture && !!dayImage)
           const label = [
             `${day}. Dezember`,
             isToday ? "heute" : null,
             winner ? `gewonnen von ${winner.name}` : isFuture ? "noch zu" : "nicht ausgelost",
             dayImage ? "mit Foto" : null,
-            isAdmin && winner ? "Foto hochladen" : null,
+            uploadable ? "Foto hochladen" : null,
           ]
             .filter(Boolean)
             .join(", ")
@@ -158,8 +164,8 @@ export default function CalendarGrid({
                 <StarIcon className="absolute right-1 bottom-1 h-4 w-4 text-bulb drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)] md:h-5 md:w-5" />
               )}
 
-              {isAdmin && winner && !dayImage && (
-                <Camera className="absolute top-1.5 right-1.5 h-3 w-3 text-ink/50 md:h-3.5 md:w-3.5" />
+              {uploadable && !dayImage && (
+                <Camera className="absolute top-1.5 right-1.5 h-3 w-3 text-ink/70 md:h-3.5 md:w-3.5" />
               )}
             </motion.button>
           )
@@ -169,7 +175,7 @@ export default function CalendarGrid({
       <p className="mt-4 px-1 text-xs leading-relaxed text-cream-dim md:text-sm">
         {isAdmin
           ? "Als Admin kannst du jedes ausgeloste Feld antippen und ein Foto hochladen."
-          : "Tippe auf ein Feld mit Foto, um es groß anzusehen."}
+          : "Tippe auf ein Feld mit Foto, um es groß anzusehen. Foto vergessen? Tippe auf dein Feld mit der Kamera."}
       </p>
     </div>
   )

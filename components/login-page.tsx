@@ -5,50 +5,28 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Awning, MarqueeSign, TreeMark } from "@/components/booth"
-import type { Participant, DrawingState } from "@/lib/types"
 import Snowfall from "@/components/snowfall"
 
 interface LoginPageProps {
-  onLogin: (user: Participant) => void
-  drawingState: DrawingState | null
+  onLogin: (name: string, password: string) => Promise<void>
 }
 
-export default function LoginPage({ onLogin, drawingState }: LoginPageProps) {
+export default function LoginPage({ onLogin }: LoginPageProps) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isShaking, setIsShaking] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!drawingState) {
-      setError("System wird geladen...")
-      return
+    try {
+      await onLogin(username, password)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Anmeldung fehlgeschlagen")
+      setIsShaking(true)
+      setTimeout(() => setIsShaking(false), 500)
     }
-
-    const storedCredentials = localStorage.getItem("familyCredentials")
-    if (!storedCredentials) {
-      setError("Keine Anmeldedaten gefunden. Bitte kontaktiere den Administrator.")
-      return
-    }
-
-    const credentials = JSON.parse(storedCredentials)
-    const credential = credentials.find(
-      (c: any) => c.name.toLowerCase() === username.toLowerCase() && c.password === password,
-    )
-
-    if (credential) {
-      const user = drawingState.participants.find((p) => p.name.toLowerCase() === username.toLowerCase())
-      if (user) {
-        onLogin(user)
-        return
-      }
-    }
-
-    setError("Benutzername oder Passwort falsch")
-    setIsShaking(true)
-    setTimeout(() => setIsShaking(false), 500)
   }
 
   const fieldClass =

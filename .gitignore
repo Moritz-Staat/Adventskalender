@@ -28,3 +28,6 @@ next-env.d.ts
 # impeccable: lokale Review-Screenshots und Entscheidungs-Logs
 .impeccable/review/
 .impeccable/questions/
+
+# Laufzeitdaten (SQLite und Fotos)
+/data/

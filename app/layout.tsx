@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Rye, Big_Shoulders, Figtree } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
 import "./globals.css"
 
@@ -52,7 +51,6 @@ export default function RootLayout({
             style: { background: "#241512", color: "#f4ead6", border: "1px solid #4a2a22" },
           }}
         />
-        <Analytics />
       </body>
     </html>
   )
