@@ -1,6 +1,6 @@
 # Betrieb auf intelnuc
 
-Live unter `advent.staatsprojekte.uk`: Cloudflare-Tunnel → Nginx Proxy Manager → Container `adventskalender:3000`.
+Live unter `adventskalender.staatsprojekte.uk`: Cloudflare-Tunnel → Nginx Proxy Manager → Container `adventskalender:3000`.
 Daten liegen in `~/stacks/adventskalender/data` (`advent.db` plus `images/`).
 
 ```sh
