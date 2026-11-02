@@ -8,15 +8,17 @@ import WheelModal from "@/components/wheel-modal"
 import { Awning, BulbRow, TreeMark } from "@/components/booth"
 import type { Participant, DrawingState } from "@/lib/types"
 import { getCurrentDay } from "@/lib/utils"
+import { toast } from "sonner"
 import {
   getDrawingState,
+  getSession,
   hasUserViewedDraw,
+  login,
+  logout,
   markDrawAsViewed,
-  performDraw as performSupabaseDraw,
-  uploadDrawImage,
-  uploadImageToStorage,
-  checkSetupStatus,
-} from "@/lib/supabase-helpers"
+  performDraw,
+  uploadImage,
+} from "@/lib/api"
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<Participant | null>(null)
@@ -30,68 +32,45 @@ export default function Home() {
     loadData()
   }, [])
 
+  // Holt den Stand nach dem Anmelden und spielt das Rad ab, falls heute schon gelost wurde
+  const enterAs = async (userId: string) => {
+    const state = await getDrawingState()
+    const user = state.participants.find((p) => p.id === userId)
+    setDrawingState(state)
+    setCurrentUser(user ?? null)
+    if (!user) return
+
+    const currentDay = getCurrentDay()
+    const todayWinner = state.winnersByDay[currentDay]
+    if (todayWinner && !(await hasUserViewedDraw(currentDay))) {
+      setPendingWinner(todayWinner)
+      setShowLoginAnimation(true)
+    }
+  }
+
   const loadData = async () => {
     try {
       setIsLoading(true)
-      const setupComplete = await checkSetupStatus()
-      setIsSetupComplete(setupComplete)
-
-      if (!setupComplete) {
-        setIsLoading(false)
-        return
-      }
-
-      const state = await getDrawingState()
-      setDrawingState(state)
-
-      const savedUser = localStorage.getItem("currentUser")
-      if (savedUser) {
-        const savedUserData = JSON.parse(savedUser)
-        const updatedUser = state.participants.find((p) => p.id === savedUserData.id)
-        if (updatedUser) {
-          setCurrentUser(updatedUser)
-          localStorage.setItem("currentUser", JSON.stringify(updatedUser))
-
-          const currentDay = getCurrentDay()
-          const todayWinner = state.winnersByDay[currentDay]
-
-          if (todayWinner) {
-            const hasViewed = await hasUserViewedDraw(updatedUser.id, currentDay)
-            if (!hasViewed) {
-              setPendingWinner(todayWinner)
-              setShowLoginAnimation(true)
-            }
-          }
-        }
-      }
+      const session = await getSession()
+      setIsSetupComplete(session.setupComplete)
+      if (session.user) await enterAs(session.user.id)
     } catch (error) {
-      console.error("[v0] Error loading data from Supabase:", error)
+      console.error("[v0] Error loading data:", error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleLogin = async (user: Participant) => {
-    setCurrentUser(user)
-    localStorage.setItem("currentUser", JSON.stringify(user))
-
-    if (drawingState) {
-      const currentDay = getCurrentDay()
-      const todayWinner = drawingState.winnersByDay[currentDay]
-
-      if (todayWinner) {
-        const hasViewed = await hasUserViewedDraw(user.id, currentDay)
-        if (!hasViewed) {
-          setPendingWinner(todayWinner)
-          setShowLoginAnimation(true)
-        }
-      }
-    }
+  const handleLogin = async (name: string, password: string) => {
+    await login(name, password)
+    const session = await getSession()
+    if (session.user) await enterAs(session.user.id)
   }
 
   const handleLogout = () => {
     setCurrentUser(null)
-    localStorage.removeItem("currentUser")
+    setDrawingState(null)
+    logout().catch((error) => console.error("[v0] Error logging out:", error))
   }
 
   const reloadDrawingState = async () => {
@@ -105,8 +84,7 @@ export default function Home() {
 
   const handleLoginAnimationComplete = async () => {
     if (currentUser && pendingWinner) {
-      const currentDay = getCurrentDay()
-      await markDrawAsViewed(currentUser.id, currentDay)
+      await markDrawAsViewed(getCurrentDay())
     }
   }
 
@@ -116,23 +94,21 @@ export default function Home() {
   }
 
   // Erst in der Datenbank auslosen, dann dreht das Rad genau zu diesem Gewinner
-  const handlePerformDraw = async () => {
-    return performSupabaseDraw(getCurrentDay())
-  }
+  const handlePerformDraw = () => performDraw()
 
   const handleDrawRevealed = async () => {
     if (!currentUser) return
-    await markDrawAsViewed(currentUser.id, getCurrentDay())
+    await markDrawAsViewed(getCurrentDay())
     await reloadDrawingState()
   }
 
   const handleImageUpload = async (day: number, file: File) => {
     try {
-      const imageUrl = await uploadImageToStorage(day, file)
-      await uploadDrawImage(day, imageUrl)
+      await uploadImage(day, file)
       await reloadDrawingState()
     } catch (error) {
       console.error("[v0] Error uploading image:", error)
+      toast.error(error instanceof Error ? error.message : "Das Foto konnte nicht hochgeladen werden.")
     }
   }
 
@@ -158,7 +134,7 @@ export default function Home() {
   }
 
   if (!currentUser || !drawingState) {
-    return <LoginPage onLogin={handleLogin} drawingState={drawingState} />
+    return <LoginPage onLogin={handleLogin} />
   }
 
   return (

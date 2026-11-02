@@ -1,69 +1,23 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { hashPassword, participantId } from "@/lib/server/core.mjs"
+import { db, json } from "@/lib/server/db"
 
+// Die Seite ist öffentlich erreichbar: wer zuerst käme, würde sonst den Kalender einrichten.
+// Eingerichtet wird deshalb über scripts/manage.mjs; das Formular nur mit SETUP_ENABLED=true.
 export async function POST(request: Request) {
-  try {
-    const { familySize, members } = await request.json()
+  if (process.env.SETUP_ENABLED !== "true") return json({ error: "Einrichtung ist deaktiviert" }, 403)
 
-    const supabase = await createClient()
+  const { n } = db().prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }
+  if (n > 0) return json({ error: "Bereits eingerichtet" }, 400)
 
-    // Check if setup is already complete
-    const { data: setupData } = await supabase.from("app_setup").select("is_setup_complete").eq("id", 1).single()
-
-    if (setupData?.is_setup_complete) {
-      return NextResponse.json({ error: "Setup already complete" }, { status: 400 })
-    }
-
-    // Delete existing participants (except setup admin)
-    await supabase.from("participants").delete().neq("id", "admin")
-
-    // Delete existing draws and cycle state
-    await supabase.from("daily_draws").delete().neq("day", 0)
-    await supabase.from("user_viewed_draws").delete().neq("day", 0)
-    await supabase
-      .from("cycle_state")
-      .update({
-        current_cycle: 1,
-        participants_in_cycle: [],
-      })
-      .eq("id", 1)
-
-    // Insert new participants
-    const participantsToInsert = members.map((member: any) => ({
-      id: member.name.toLowerCase().replace(/\s+/g, "_"),
-      name: member.name,
-      is_active: true,
-      // Store password hash in a real app, but for simplicity we'll validate client-side
-    }))
-
-    const { error: insertError } = await supabase.from("participants").insert(participantsToInsert)
-
-    if (insertError) throw insertError
-
-    // Mark setup as complete
-    await supabase
-      .from("app_setup")
-      .update({
-        is_setup_complete: true,
-        family_size: familySize,
-        setup_completed_at: new Date().toISOString(),
-      })
-      .eq("id", 1)
-
-    // Deactivate setup admin
-    await supabase.from("participants").update({ is_active: false }).eq("id", "admin")
-
-    // Store passwords and admin info in localStorage (client-side validation)
-    return NextResponse.json({
-      success: true,
-      credentials: members.map((m: any) => ({
-        name: m.name,
-        password: m.password,
-        isAdmin: m.isAdmin,
-      })),
-    })
-  } catch (error) {
-    console.error("Setup error:", error)
-    return NextResponse.json({ error: "Setup failed" }, { status: 500 })
+  const body = await request.json().catch(() => null)
+  const members = body?.members
+  if (!Array.isArray(members) || members.length < 3 || members.length > 6) {
+    return json({ error: "3 bis 6 Mitglieder erforderlich" }, 400)
   }
+
+  const insert = db().prepare("INSERT INTO participants (id, name, password_hash, is_admin) VALUES (?, ?, ?, ?)")
+  db().transaction(() => {
+    for (const m of members) insert.run(participantId(m.name), m.name.trim(), hashPassword(m.password), m.isAdmin ? 1 : 0)
+  })()
+  return json({ success: true })
 }

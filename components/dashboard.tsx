@@ -14,7 +14,7 @@ import { ImageViewerModal } from "@/components/image-viewer-modal"
 import { Awning, MarqueeSign, NameStamp, TreeMark } from "@/components/booth"
 import type { Participant, DrawingState, Settings } from "@/lib/types"
 import { getCurrentDay } from "@/lib/utils"
-import { getAllImages } from "@/lib/supabase-helpers"
+import { getAllImages } from "@/lib/api"
 import JSZip from "jszip"
 import { toast } from "sonner"
 
